@@ -16,11 +16,16 @@ model User {
   name      String   @unique
   age       Int
   avatar    String
-  pinHash   String
   sparks    Int      @default(0)
   createdAt DateTime @default(now())
 
-  // Parent/guardian email — used for billing receipts & account recovery.
+  // Clerk handles login/passwords. clerkId links this profile to a Clerk account.
+  // It's nullable so demo/seed users (content authors who never log in) can exist.
+  clerkId String? @unique
+  // Legacy PIN auth (kept optional for old rows; no longer used).
+  pinHash String?
+
+  // Email — used for billing receipts & notifications.
   email            String? @unique
   // Subscription: "free" | "pro". Set by the Stripe webhook.
   plan             String  @default("free")

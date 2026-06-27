@@ -7,21 +7,13 @@ async function jsonOrThrow(res: Response) {
 }
 
 export const api = {
-  async me(): Promise<User | null> {
+  async me(): Promise<{ authed: boolean; user: User | null }> {
     const r = await fetch("/api/auth");
-    const d = await r.json();
-    return d.user;
+    return r.json();
   },
-  async signup(input: { name: string; pin: string; age: number; avatar: string; email?: string }): Promise<User> {
-    const d = await jsonOrThrow(await post("/api/auth", { action: "signup", ...input }));
+  async createProfile(input: { name: string; age: number; avatar: string }): Promise<User> {
+    const d = await jsonOrThrow(await post("/api/profile", input));
     return d.user;
-  },
-  async login(input: { name: string; pin: string }): Promise<User> {
-    const d = await jsonOrThrow(await post("/api/auth", { action: "login", ...input }));
-    return d.user;
-  },
-  async logout() {
-    await post("/api/auth", { action: "logout" });
   },
   async projects(type = "all", author?: string): Promise<Project[]> {
     const q = new URLSearchParams({ type });

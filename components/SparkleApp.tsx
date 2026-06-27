@@ -1,203 +1,86 @@
 "use client";
-import { useState } from "react";
-import { levelFor } from "@/lib/constants";
-import type { Project, User, Award } from "./types";
+import { useEffect, useState } from "react";
+import { useUser, useClerk } from "@clerk/nextjs";
+import type { Project, User } from "./types";
 import { api } from "./api";
-import { confetti } from "./fx";
-import Feed from "./Feed";
-import Profile from "./Profile";
-import AddModal from "./AddModal";
-import DetailModal from "./DetailModal";
-import AuthModal from "./AuthModal";
+import MainApp from "./MainApp";
+import Landing from "./Landing";
+import Onboarding from "./Onboarding";
 
 export default function SparkleApp({
+  clerkEnabled,
+  initialUser,
+  initialProjects,
+}: {
+  clerkEnabled: boolean;
+  authed: boolean;
+  initialUser: User | null;
+  initialProjects: Project[];
+}) {
+  // Without Clerk keys the app still boots — show a friendly setup screen.
+  if (!clerkEnabled) return <SetupNotice />;
+  return <ClerkGate initialUser={initialUser} initialProjects={initialProjects} />;
+}
+
+function Spinner() {
+  return <main className="wrap"><div className="spinner" /></main>;
+}
+
+// Uses Clerk hooks — only ever mounted when ClerkProvider is present.
+function ClerkGate({
   initialUser,
   initialProjects,
 }: {
   initialUser: User | null;
   initialProjects: Project[];
 }) {
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
-  const [route, setRoute] = useState<"feed" | "profile">("feed");
-  const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(false);
+  const { isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
+  const [profile, setProfile] = useState<User | null>(initialUser);
+  const [checking, setChecking] = useState(false);
 
-  const [detail, setDetail] = useState<Project | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
-  const [addType, setAddType] = useState<string | undefined>(undefined);
-  const [levelUp, setLevelUp] = useState<{ e: string; name: string } | null>(null);
-  const [award, setAward] = useState<Award | null>(null);
-
-  // ---- data helpers ----
-  function patch(updated: Project) {
-    setProjects((ps) => ps.map((p) => (p.id === updated.id ? { ...updated } : p)));
-    setDetail((d) => (d && d.id === updated.id ? { ...updated } : d));
-  }
-
-  async function changeFilter(c: string) {
-    setFilter(c);
-    setLoading(true);
-    const list = await api.projects(c);
-    setProjects(list);
-    setLoading(false);
-  }
-
-  function bumpSparks(n: number) {
-    setUser((u) => {
-      if (!u) return u;
-      const before = levelFor(u.sparks).idx;
-      const next = { ...u, sparks: u.sparks + n };
-      const after = levelFor(next.sparks).idx;
-      if (after > before) {
-        const L = levelFor(next.sparks).lv;
-        setLevelUp({ e: L.e, name: L.name });
-        confetti();
-      }
-      return next;
-    });
-  }
-
-  async function like(p: Project, btn: HTMLElement) {
-    if (!user) return;
-    // optimistic
-    const optimistic = { ...p, liked: !p.liked, likes: p.likes + (p.liked ? -1 : 1) };
-    patch(optimistic);
-    try {
-      const res = await api.toggleLike(p.id);
-      patch({ ...p, liked: res.liked, likes: res.likes });
-      if (res.liked) bumpSparks(1);
-    } catch {
-      patch(p); // revert
+  // Signed in (per Clerk) but no profile loaded yet -> fetch it.
+  useEffect(() => {
+    if (isSignedIn && !profile) {
+      setChecking(true);
+      api.me().then((r) => setProfile(r.user)).finally(() => setChecking(false));
     }
-  }
-
-  function onCommented(p: Project) {
-    patch({ ...p });
-    bumpSparks(2);
-  }
-
-  function onCreated(p: Project, earned: Award) {
-    setProjects((ps) => [p, ...ps.filter((x) => x.id !== p.id)]);
-    setAddOpen(false);
-    setFilter("all");
-    setRoute("feed");
-    confetti();
-    setAward(earned);
-    bumpSparks(earned.total);
-  }
-
-  function openAdd(type?: string) {
-    setAddType(type);
-    setDetail(null);
-    setAddOpen(true);
-  }
+  }, [isSignedIn, profile]);
 
   async function logout() {
-    await api.logout();
-    setUser(null);
-    setRoute("feed");
+    setProfile(null);
+    await signOut();
   }
 
-  // ---- not logged in ----
-  if (!user) {
-    return <AuthModal onDone={(u) => { setUser(u); setRoute("feed"); confetti(); }} />;
-  }
+  // We already know who they are (from the server) — go straight in, no flash.
+  if (profile) return <MainApp profile={profile} initialProjects={initialProjects} onLogout={logout} />;
+  if (!isLoaded) return <Spinner />;
+  if (!isSignedIn) return <Landing />;
+  if (checking) return <Spinner />;
+  return <Onboarding onDone={setProfile} />;
+}
 
+function SetupNotice() {
   return (
-    <>
-      <header>
-        <div className="bar">
-          <div className="logo" onClick={() => setRoute("feed")}>
-            <div className="mark">✨</div><span>Spark<b>le</b></span>
-          </div>
-          <div className="spacer" />
-          <div className="coin" title="Sparks you earned!"><span className="big">⚡</span><span>{user.sparks}</span></div>
-          <button className="me-btn" onClick={() => setRoute("profile")}>
-            <span>{user.name}</span><span className="av">{user.avatar}</span>
-          </button>
-        </div>
-      </header>
-
-      <main className="wrap">
-        {route === "feed" ? (
-          <Feed
-            user={user}
-            projects={projects}
-            filter={filter}
-            setFilter={changeFilter}
-            loading={loading}
-            onOpen={setDetail}
-            onLike={like}
-          />
-        ) : (
-          <Profile user={user} onOpen={setDetail} onLike={like} onLogout={logout} />
-        )}
-      </main>
-
-      <button className="fab" onClick={() => openAdd()}>
-        <span className="plus">＋</span><span className="lbl">Add Project</span>
-      </button>
-
-      <nav className="botnav">
-        <button className={route === "feed" ? "on" : ""} onClick={() => setRoute("feed")}>
-          <span className="e">🏠</span>Explore
-        </button>
-        <button onClick={() => openAdd()}><span className="e">➕</span>Add</button>
-        <button className={route === "profile" ? "on" : ""} onClick={() => setRoute("profile")}>
-          <span className="e">⭐</span>Me
-        </button>
-      </nav>
-
-      {detail && (
-        <DetailModal
-          project={detail}
-          meName={user.name}
-          onClose={() => setDetail(null)}
-          onLike={like}
-          onCommented={onCommented}
-          onInspired={(type) => openAdd(type)}
-        />
-      )}
-
-      {addOpen && (
-        <AddModal initialType={addType} onClose={() => setAddOpen(false)} onCreated={onCreated} />
-      )}
-
-      {award && (
-        <div className="scrim" onClick={() => setAward(null)}>
-          <div className="modal" style={{ maxWidth: 400, textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ fontSize: 64 }}>⚡</div>
-            <h2>You earned {award.total} Sparks!</h2>
-            <p className="sub">Here&apos;s how you earned them:</p>
-            <div className="award-list">
-              {award.parts.map((part, i) => (
-                <div className="award-row" key={i}>
-                  <span className="al">{part.emoji} {part.label}</span>
-                  <span className="ap">+{part.points}</span>
-                </div>
-              ))}
-              <div className="award-row total">
-                <span className="al">Total</span>
-                <span className="ap">⚡ {award.total}</span>
-              </div>
-            </div>
-            <p className="hint">💡 Get even more when other kids ❤️ like and 💬 comment on your project!</p>
-            <button className="primary" onClick={() => setAward(null)}>Woohoo! 🎉</button>
-          </div>
-        </div>
-      )}
-
-      {!award && levelUp && (
-        <div className="scrim" onClick={() => setLevelUp(null)}>
-          <div className="modal" style={{ maxWidth: 380, textAlign: "center" }}>
-            <div style={{ fontSize: 74 }}>🏆</div>
-            <h2>Level Up! {levelUp.e}</h2>
-            <p className="sub">You&apos;re now a {levelUp.name}! Keep sharing to climb higher.</p>
-            <button className="primary" onClick={() => setLevelUp(null)}>Awesome! 🎉</button>
-          </div>
-        </div>
-      )}
-    </>
+    <main className="wrap">
+      <div className="hero" style={{ display: "block" }}>
+        <h1>✨ Sparkle is almost ready</h1>
+        <p>One step left: add your Clerk keys to switch on logins.</p>
+      </div>
+      <div className="badges" style={{ lineHeight: 1.6 }}>
+        <h3>Turn on accounts (2 minutes)</h3>
+        <ol>
+          <li>Create a free app at <b>clerk.com</b>.</li>
+          <li>Copy the <b>Publishable key</b> and <b>Secret key</b>.</li>
+          <li>Add them to <code>.env</code> (and Vercel) as
+            <br /><code>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</code> and <code>CLERK_SECRET_KEY</code>.</li>
+          <li>Restart the app — logins go live. 🎉</li>
+        </ol>
+        <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>
+          Everything else (projects, scoring, Stripe, emails) is already built and waiting.
+          See <b>LAUNCH.md</b> for the full checklist.
+        </p>
+      </div>
+    </main>
   );
 }

@@ -8,15 +8,16 @@ uses **Postgres**. The steps below switch you over — it's one small change.
 
 ---
 
-## Step 1 — Get a free Postgres database (Neon)
+## Step 1 — Get a free Postgres database (Supabase)
 
-1. Go to **https://neon.tech** and sign up (free, no card).
-2. Create a new project. Copy the **connection string** — it looks like:
+1. Go to **https://supabase.com** and create a project (free).
+2. Project Settings → Database → **Connection string (URI)**. Use the **Transaction
+   pooler** string for serverless. It looks like:
    ```
-   postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+   postgresql://postgres.xxxx:password@aws-0-region.pooler.supabase.com:6543/postgres
    ```
 
-> Alternatives that also work: Vercel Postgres, Supabase, Railway, Turso.
+> Alternatives that also work: Neon, Vercel Postgres, Railway.
 
 ## Step 2 — Tell Prisma to use Postgres
 
@@ -32,8 +33,8 @@ datasource db {
 Then regenerate the migration for Postgres:
 
 ```bash
-rm -rf prisma/migrations          # remove the SQLite migration
-# put your Neon URL in .env as DATABASE_URL, then:
+rm -rf prisma/migrations          # remove the SQLite migrations
+# put your Supabase URL in .env as DATABASE_URL, then:
 npx prisma migrate dev --name init
 npm run db:seed                   # optional: add demo content to production DB
 ```
@@ -53,11 +54,13 @@ git push -u origin main
 
 1. Go to **https://vercel.com**, sign in with GitHub.
 2. **Add New → Project** → import your `sparkle` repo.
-3. Under **Environment Variables**, add:
+3. Under **Environment Variables**, add (see the full table in [LAUNCH.md](LAUNCH.md)):
    | Name | Value |
    |------|-------|
-   | `DATABASE_URL` | your Neon connection string |
-   | `SESSION_SECRET` | a long random string (run `openssl rand -hex 32`) |
+   | `DATABASE_URL` | your Supabase connection string |
+   | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | from Clerk |
+   | `CLERK_SECRET_KEY` | from Clerk |
+   | `NEXT_PUBLIC_APP_URL` | your site URL |
 4. Click **Deploy**.
 
 The `build` script already runs `prisma generate && prisma migrate deploy`, so your

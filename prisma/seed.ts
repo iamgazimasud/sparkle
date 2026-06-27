@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { hashPin } from "../lib/hash";
 
 const prisma = new PrismaClient();
 
@@ -15,13 +14,14 @@ const USERS = [
 async function main() {
   console.log("🌱 Seeding Sparkle...");
 
-  // Demo accounts all use PIN 1234 so you can log in and explore.
+  // Demo makers — these are content authors only (they never log in via Clerk),
+  // so their projects appear in the feed for new users to get inspired by.
   const users: Record<string, string> = {};
   for (const u of USERS) {
     const created = await prisma.user.upsert({
       where: { name: u.name },
       update: {},
-      create: { ...u, pinHash: hashPin("1234"), sparks: 30 + Math.floor(Math.random() * 80) },
+      create: { ...u, sparks: 30 + Math.floor(Math.random() * 80) },
     });
     users[u.name] = created.id;
   }
@@ -61,8 +61,8 @@ async function main() {
     }
   }
 
-  console.log("✅ Seeded", USERS.length, "makers and", projects.length, "projects.");
-  console.log("👉 Demo login: any nickname above (e.g. DragonGirl) with PIN 1234");
+  console.log("✅ Seeded", USERS.length, "demo makers and", projects.length, "projects.");
+  console.log("👉 Sign up with Clerk to create your own maker profile.");
 }
 
 main()

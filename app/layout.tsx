@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import { clerkEnabledPublic } from "@/lib/clerk";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +16,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
+  const body = (
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,5 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
       </body>
     </html>
+  );
+
+  // Only wrap with Clerk when keys are configured; otherwise the app still renders.
+  return clerkEnabledPublic ? (
+    <ClerkProvider appearance={{ variables: { colorPrimary: "#8a5cff" } }}>{body}</ClerkProvider>
+  ) : (
+    body
   );
 }

@@ -19,13 +19,16 @@ Do these in order. The whole thing is ~30–45 minutes.
 - This is where the live site runs. You'll paste all the keys below into its dashboard
   (Project → Settings → Environment Variables).
 
-### 3. Database — **Neon Postgres** (free, no card)
-- Sign up at https://neon.tech, create a project.
-- Copy the connection string → this is your **`DATABASE_URL`**.
+### 3. Database — **Supabase Postgres** (free)
+- Sign up at https://supabase.com, create a project.
+- Go to Project Settings → Database → **Connection string** (URI). Use the
+  **"Transaction" pooler** string for serverless. Copy it → this is your **`DATABASE_URL`**.
 
-### 4. Login secret — **just generate one**
-- Run in a terminal: `openssl rand -hex 32`
-- Copy the output → this is your **`SESSION_SECRET`**.
+### 4. Auth — **Clerk** (free tier)
+- Create a free app at https://dashboard.clerk.com.
+- Choose the sign-in methods you want (email, Google, etc.).
+- Copy **Publishable key** → **`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`**
+  and **Secret key** → **`CLERK_SECRET_KEY`** (API Keys page).
 
 ### 5. Payments — **Stripe** (free to start; takes a cut per sale)
 - Sign up at https://stripe.com.
@@ -61,14 +64,18 @@ This is not optional once real children use it:
 
 | Variable | From step | Required? |
 |---|---|---|
-| `DATABASE_URL` | 3 (Neon) | ✅ yes |
-| `SESSION_SECRET` | 4 (generate) | ✅ yes |
+| `DATABASE_URL` | 3 (Supabase) | ✅ yes |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | 4 (Clerk) | ✅ yes |
+| `CLERK_SECRET_KEY` | 4 (Clerk) | ✅ yes |
 | `NEXT_PUBLIC_APP_URL` | 2 or 7 | ✅ yes |
 | `STRIPE_SECRET_KEY` | 5 | for payments |
 | `STRIPE_PRICE_ID` | 5 | for payments |
 | `STRIPE_WEBHOOK_SECRET` | 5 | for payments |
 | `RESEND_API_KEY` | 6 | for emails |
 | `EMAIL_FROM` | 6 | for emails |
+
+> The app boots **without** Clerk keys too — it just shows a "finish setup" screen
+> until you add them. Stripe/Resend stay off until their keys are added.
 
 > The app runs fine **without** the Stripe/Resend keys — those features just stay off
 > until you add them. So you can launch first and turn on payments later.

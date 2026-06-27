@@ -7,8 +7,9 @@ YouTube videos, games & code, videos, and music), cheer each other on, and — m
 importantly — get *inspired* to create their own. Every project has a big
 **"This inspired me — I'll make one too!"** button that turns watchers into makers.
 
-Built with **Next.js 15 (App Router) + React 19 + Prisma + SQLite**, ready to deploy
-to the world on Vercel.
+**Stack:** Next.js 15 (App Router) · React 19 · Prisma · **Clerk** (auth) ·
+**Supabase/Postgres** (prod DB, SQLite for local) · **Stripe** (payments) ·
+**Resend** (email) · deployed on **Vercel**.
 
 ---
 
@@ -20,7 +21,9 @@ to the world on Vercel.
 - 🌟 **Likes / stars** to cheer each other on
 - ✨ **The inspiration engine** — "This inspired me!" opens the create screen pre-set to that project type
 - ⚡ **Sparks, Levels & Badges** — earn points for posting (+10), commenting (+2) and reacting (+1); climb from 🌱 Sprout to 🌟 Superstar; unlock badges
-- 🛡️ **Kid-safety first** — anonymous emoji avatars (no photos of kids), nickname + secret PIN sign-up (no email), safety reminders, kindness filter
+- 🔐 **Real accounts via Clerk** — sign in with email/social; then pick an anonymous emoji avatar + nickname (kids never show real names to each other)
+- 💳 **Stripe "Sparkle Pro"** subscription + **Resend** welcome emails
+- 🛡️ **Kid-safety first** — anonymous emoji avatars (no photos of kids), nickname display only, safety reminders, kindness filter
 - 📱 Fully responsive with a mobile bottom-nav
 
 ## 🚀 Run it locally
@@ -35,9 +38,12 @@ npm run dev         # http://localhost:4321
 > If you cloned this repo, the migration is already created — run
 > `npx prisma migrate dev` instead of `db:push` to apply it.
 
-### 👤 Demo logins
-All demo accounts use **PIN `1234`**. Try nickname **`DragonGirl`**, `PixelPete`,
-`MakerMax`, `MelodyMoon`, `BlockBuddy`, or `ScienceSam`. Or just make a new account!
+### 🔑 Turn on logins (Clerk)
+Auth is handled by **Clerk**. Until you add keys, the app boots and shows a
+"finish setup" screen. Create a free app at [clerk.com](https://clerk.com), then put
+`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in `.env` and restart.
+The 6 demo makers (DragonGirl, PixelPete, …) are content authors so the feed looks
+alive — you create your own profile by signing up.
 
 ## 🌍 Put it online (free)
 
@@ -52,12 +58,15 @@ app/
   layout.tsx            Fonts, metadata, background
   globals.css           All the playful styling
   api/
-    auth/route.ts       Signup / login / logout / current user
+    auth/route.ts       Who am I? (Clerk-aware)
+    profile/route.ts    Create a Sparkle profile (onboarding)
     projects/route.ts   List + create projects
     projects/[id]/like/route.ts      Toggle a like
     projects/[id]/comments/route.ts  Add a comment
-components/             Client UI (Feed, Profile, cards, modals, effects)
-lib/                    db, auth/sessions, constants, helpers
+    stripe/checkout, stripe/webhook  Sparkle Pro subscription
+components/             Client UI (SparkleApp gate, MainApp, Feed, Profile, modals)
+lib/                    db, auth (Clerk), clerk, stripe, email, constants, helpers
+middleware.ts           Clerk middleware (gated)
 prisma/                 schema + migration + seed
 ```
 
