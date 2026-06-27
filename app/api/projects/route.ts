@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { getProjects } from "@/lib/shape";
-import { isKind, ytId, CATS, ART_EMOJIS, SPARKS } from "@/lib/constants";
+import { isKind, ytId, CATS, ART_EMOJIS } from "@/lib/constants";
+import { scoreNewProject } from "@/lib/score";
 
 // GET /api/projects?type=art&author=<id>
 export async function GET(req: Request) {
@@ -49,8 +50,16 @@ export async function POST(req: Request) {
     },
   });
 
-  await prisma.user.update({ where: { id: user.id }, data: { sparks: { increment: SPARKS.post } } });
+  // Award Sparks based on effort & complexity (community "beauty" points come later
+  // via likes/comments). Server-authoritative so it can't be faked from the client.
+  const award = scoreNewProject({
+    type,
+    desc,
+    hasImage: !!image,
+    hasVideo: type === "youtube" ? !!ytId(link) : type === "video" && !!link,
+  });
+  await prisma.user.update({ where: { id: user.id }, data: { sparks: { increment: award.total } } });
 
   const [shaped] = await getProjects({ viewerId: user.id, authorId: user.id });
-  return NextResponse.json({ project: shaped ?? { id: project.id } });
+  return NextResponse.json({ project: shaped ?? { id: project.id }, award });
 }

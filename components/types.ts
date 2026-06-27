@@ -1,5 +1,8 @@
 export type User = { id: string; name: string; age: number; avatar: string; sparks: number };
 
+export type AwardPart = { label: string; points: number; emoji: string };
+export type Award = { total: number; parts: AwardPart[] };
+
 export type Comment = {
   id: string;
   text: string;

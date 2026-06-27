@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { SPARKS } from "@/lib/constants";
+import { COMMUNITY } from "@/lib/score";
 
 // POST /api/projects/[id]/like -> toggle like
 export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -23,10 +24,14 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
   } else {
     await prisma.like.create({ data: { userId: user.id, projectId: id } });
     liked = true;
-    // The viewer earns a spark for engaging; the creator earns one for being loved.
+    // The viewer earns a small spark for engaging; the creator earns more for being
+    // loved — this is the "people like it / how beautiful" part of the score.
     await prisma.user.update({ where: { id: user.id }, data: { sparks: { increment: SPARKS.like } } });
     if (project.authorId !== user.id)
-      await prisma.user.update({ where: { id: project.authorId }, data: { sparks: { increment: SPARKS.like } } });
+      await prisma.user.update({
+        where: { id: project.authorId },
+        data: { sparks: { increment: COMMUNITY.likeReceived } },
+      });
   }
 
   const count = await prisma.like.count({ where: { projectId: id } });

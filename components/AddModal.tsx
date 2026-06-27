@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { CATS, ART_EMOJIS, ytId } from "@/lib/constants";
-import type { Project } from "./types";
+import type { Project, Award } from "./types";
 import { api } from "./api";
 
 const TYPES = Object.entries(CATS).map(([k, v]) => ({ t: k, e: v.e, label: v.label }));
@@ -13,7 +13,7 @@ export default function AddModal({
 }: {
   initialType?: string;
   onClose: () => void;
-  onCreated: (p: Project) => void;
+  onCreated: (p: Project, award: Award) => void;
 }) {
   const [type, setType] = useState(initialType && CATS[initialType] ? initialType : "art");
   const [cover, setCover] = useState("🎨");
@@ -41,12 +41,12 @@ export default function AddModal({
     if (type === "youtube" && !ytId(link)) return setErr("Paste a valid YouTube link 📺");
     setBusy(true);
     try {
-      const p = await api.createProject({
+      const { project, award } = await api.createProject({
         type, title: title.trim(), desc: desc.trim(), cover,
         link: showLink ? link.trim() : undefined,
         image: showEmoji ? image : null,
       });
-      onCreated(p);
+      onCreated(project, award);
     } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   }
 

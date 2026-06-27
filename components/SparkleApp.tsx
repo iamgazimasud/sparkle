@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { levelFor } from "@/lib/constants";
-import type { Project, User } from "./types";
+import type { Project, User, Award } from "./types";
 import { api } from "./api";
 import { confetti } from "./fx";
 import Feed from "./Feed";
@@ -27,6 +27,7 @@ export default function SparkleApp({
   const [addOpen, setAddOpen] = useState(false);
   const [addType, setAddType] = useState<string | undefined>(undefined);
   const [levelUp, setLevelUp] = useState<{ e: string; name: string } | null>(null);
+  const [award, setAward] = useState<Award | null>(null);
 
   // ---- data helpers ----
   function patch(updated: Project) {
@@ -76,13 +77,14 @@ export default function SparkleApp({
     bumpSparks(2);
   }
 
-  function onCreated(p: Project) {
+  function onCreated(p: Project, earned: Award) {
     setProjects((ps) => [p, ...ps.filter((x) => x.id !== p.id)]);
     setAddOpen(false);
     setFilter("all");
     setRoute("feed");
     confetti();
-    bumpSparks(10);
+    setAward(earned);
+    bumpSparks(earned.total);
   }
 
   function openAdd(type?: string) {
@@ -162,7 +164,31 @@ export default function SparkleApp({
         <AddModal initialType={addType} onClose={() => setAddOpen(false)} onCreated={onCreated} />
       )}
 
-      {levelUp && (
+      {award && (
+        <div className="scrim" onClick={() => setAward(null)}>
+          <div className="modal" style={{ maxWidth: 400, textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ fontSize: 64 }}>⚡</div>
+            <h2>You earned {award.total} Sparks!</h2>
+            <p className="sub">Here&apos;s how you earned them:</p>
+            <div className="award-list">
+              {award.parts.map((part, i) => (
+                <div className="award-row" key={i}>
+                  <span className="al">{part.emoji} {part.label}</span>
+                  <span className="ap">+{part.points}</span>
+                </div>
+              ))}
+              <div className="award-row total">
+                <span className="al">Total</span>
+                <span className="ap">⚡ {award.total}</span>
+              </div>
+            </div>
+            <p className="hint">💡 Get even more when other kids ❤️ like and 💬 comment on your project!</p>
+            <button className="primary" onClick={() => setAward(null)}>Woohoo! 🎉</button>
+          </div>
+        </div>
+      )}
+
+      {!award && levelUp && (
         <div className="scrim" onClick={() => setLevelUp(null)}>
           <div className="modal" style={{ maxWidth: 380, textAlign: "center" }}>
             <div style={{ fontSize: 74 }}>🏆</div>

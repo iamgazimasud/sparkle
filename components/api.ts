@@ -1,4 +1,4 @@
-import type { Project, Comment, User } from "./types";
+import type { Project, Comment, User, Award } from "./types";
 
 async function jsonOrThrow(res: Response) {
   const data = await res.json().catch(() => ({}));
@@ -31,9 +31,9 @@ export const api = {
   },
   async createProject(input: {
     type: string; title: string; desc: string; cover: string; link?: string; image?: string | null;
-  }): Promise<Project> {
+  }): Promise<{ project: Project; award: Award }> {
     const d = await jsonOrThrow(await post("/api/projects", input));
-    return d.project;
+    return { project: d.project, award: d.award };
   },
   async toggleLike(id: string): Promise<{ liked: boolean; likes: number }> {
     return jsonOrThrow(await post(`/api/projects/${id}/like`, {}));
