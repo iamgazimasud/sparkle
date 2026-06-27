@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sparkle — Where Kids Show Off Cool Projects ✨</title>
+<style>
+/* ============ THEME ============ */
+:root{
+  --bg:#fff7fb;
+  --bg2:#eef4ff;
+  --card:#ffffff;
+  --ink:#2b2150;
+  --ink-soft:#6a6390;
+  --pink:#ff5fa2;
+  --purple:#8a5cff;
+  --blue:#3aa0ff;
+  --green:#27d2a0;
+  --yellow:#ffce3a;
+  --orange:#ff8a3d;
+  --shadow:0 10px 30px rgba(110,80,200,.18);
+  --shadow-sm:0 6px 16px rgba(110,80,200,.14);
+  --radius:24px;
+  --font:'Baloo 2', 'Comic Sans MS', 'Trebuchet MS', system-ui, sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #ffe6f3 0%, transparent 60%),
+    radial-gradient(1000px 600px at 110% 10%, #e3edff 0%, transparent 55%),
+    var(--bg);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:inherit}
+img{max-width:100%;display:block}
+::selection{background:#ffd0e6}
+
+/* floating background blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(8px);opacity:.5;z-index:0;animation:float 9s ease-in-out infinite}
+.blob.b1{width:120px;height:120px;background:#ffd86b;top:18%;left:4%;animation-delay:.2s}
+.blob.b2{width:90px;height:90px;background:#7fd7ff;top:60%;left:8%;animation-delay:1.2s}
+.blob.b3{width:140px;height:140px;background:#ffa6d2;top:30%;right:5%;animation-delay:.6s}
+.blob.b4{width:70px;height:70px;background:#9affc9;bottom:12%;right:10%;animation-delay:2s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-26px) rotate(8deg)}}
+
+/* ============ TOP BAR ============ */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.8);
+  backdrop-filter:blur(14px);
+  border-bottom:2px solid #fce3f0;
+}
+.bar{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 18px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:24px;letter-spacing:.3px}
+.logo .mark{
+  width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:24px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));box-shadow:var(--shadow-sm);
+  animation:wiggle 4s ease-in-out infinite;
+}
+@keyframes wiggle{0%,92%,100%{transform:rotate(0)}94%{transform:rotate(-12deg)}96%{transform:rotate(10deg)}98%{transform:rotate(-6deg)}}
+.logo b{background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.spacer{flex:1}
+.coin{
+  display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#fff2c2,#ffd86b);
+  color:#7a5a00;font-weight:800;padding:8px 14px;border-radius:999px;box-shadow:var(--shadow-sm);font-size:15px;
+}
+.coin .big{font-size:18px}
+.me-btn{display:flex;align-items:center;gap:8px;background:#fff;padding:6px 6px 6px 14px;border-radius:999px;box-shadow:var(--shadow-sm);font-weight:700;color:var(--ink)}
+.me-btn .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:var(--bg2)}
+
+/* ============ LAYOUT ============ */
+.wrap{max-width:1080px;margin:0 auto;padding:18px;position:relative;z-index:1}
+.hero{
+  background:linear-gradient(135deg,#fff 0%,#fff 100%);
+  border-radius:32px;padding:26px 28px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:22px;margin-bottom:18px;position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;inset:0;background:
+  radial-gradient(400px 200px at 90% -20%, #ffe1ef, transparent 60%);pointer-events:none}
+.hero h1{margin:0 0 6px;font-size:30px;line-height:1.1}
+.hero p{margin:0;color:var(--ink-soft);font-weight:600;font-size:16px}
+.hero .pin{font-size:64px;animation:float 6s ease-in-out infinite}
+
+/* category chips */
+.chips{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  white-space:nowrap;border-radius:999px;padding:10px 16px;font-weight:800;font-size:15px;
+  background:#fff;color:var(--ink-soft);box-shadow:var(--shadow-sm);border:2px solid transparent;
+  transition:transform .12s, border-color .15s, color .15s;
+}
+.chip:hover{transform:translateY(-2px)}
+.chip.on{color:#fff;border-color:#fff}
+.chip[data-c="all"].on{background:linear-gradient(135deg,var(--purple),var(--pink))}
+.chip[data-c="youtube"].on{background:linear-gradient(135deg,#ff5f5f,#ff8a3d)}
+.chip[data-c="art"].on{background:linear-gradient(135deg,var(--pink),#ff8ad0)}
+.chip[data-c="code"].on{background:linear-gradient(135deg,var(--blue),var(--purple))}
+.chip[data-c="video"].on{background:linear-gradient(135deg,var(--green),var(--blue))}
+.chip[data-c="music"].on{background:linear-gradient(135deg,var(--orange),var(--yellow))}
+
+/* ============ FEED GRID ============ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.card{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .15s, box-shadow .15s;position:relative;
+}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.card .thumb{aspect-ratio:16/10;background:var(--bg2);position:relative;overflow:hidden;display:grid;place-items:center}
+.card .thumb img{width:100%;height:100%;object-fit:cover}
+.card .thumb .emoji-art{font-size:74px}
+.card .thumb iframe{width:100%;height:100%;border:0}
+.badge-cat{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);border-radius:999px;padding:5px 11px;font-weight:800;font-size:12px;display:flex;align-items:center;gap:5px;box-shadow:var(--shadow-sm)}
+.play-ov{position:absolute;inset:0;display:grid;place-items:center;background:rgba(40,20,70,.18)}
+.play-ov .pbtn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:26px;box-shadow:var(--shadow)}
+.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h3{margin:0;font-size:18px;line-height:1.2}
+.card .desc{margin:0;color:var(--ink-soft);font-size:14px;font-weight:600;line-height:1.35}
+.author{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.author .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--bg2)}
+.author .age{color:var(--ink-soft);font-weight:600;font-size:12px}
+.actions{display:flex;align-items:center;gap:8px;margin-top:auto}
+.react{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:999px;padding:8px 12px;font-weight:800;font-size:14px;color:var(--ink);transition:transform .1s, background .15s}
+.react:hover{transform:scale(1.06)}
+.react.liked{background:linear-gradient(135deg,#ffe0ee,#ffd0c2)}
+.react .ic{font-size:18px}
+.comment-btn{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--bg2);border-radius:999px;padding:8px 12px;font-weight:800;font-size:14px;color:var(--blue)}
+
+/* empty state */
+.empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--ink-soft)}
+.empty .big{font-size:60px;margin-bottom:10px}
+
+/* ============ FLOATING ADD BUTTON ============ */
+.fab{
+  position:fixed;right:22px;bottom:22px;z-index:60;
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-weight:900;font-size:18px;padding:16px 22px;border-radius:999px;
+  box-shadow:0 14px 34px rgba(138,92,255,.45);transition:transform .15s;
+}
+.fab:hover{transform:translateY(-3px) scale(1.03)}
+.fab:active{transform:scale(.97)}
+.fab .plus{font-size:24px;line-height:1}
+
+/* ============ MODALS ============ */
+.scrim{position:fixed;inset:0;background:rgba(43,33,80,.45);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+.scrim.show{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:28px;box-shadow:var(--shadow);width:100%;max-width:520px;padding:24px;animation:pop .25s;position:relative;margin:auto}
+@keyframes pop{from{transform:scale(.9) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.modal h2{margin:0 0 4px;font-size:24px}
+.modal .sub{margin:0 0 18px;color:var(--ink-soft);font-weight:600}
+.x{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;background:var(--bg2);font-size:20px;font-weight:800;color:var(--ink-soft);display:grid;place-items:center}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:800;margin-bottom:7px;font-size:15px}
+.field input[type=text],.field textarea,.field input[type=url]{
+  width:100%;border:2px solid #eee;border-radius:16px;padding:13px 15px;font-size:16px;font-weight:600;color:var(--ink);background:#fbfaff;transition:border-color .15s;
+}
+.field textarea{min-height:78px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--purple)}
+.type-pick{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.type-pick .tp{border-radius:16px;padding:12px 6px;background:#fbfaff;border:2px solid #eee;text-align:center;font-weight:800;font-size:12px;color:var(--ink-soft);transition:.15s}
+.type-pick .tp .e{font-size:26px;display:block;margin-bottom:3px}
+.type-pick .tp.on{border-color:var(--purple);background:#f3eeff;color:var(--purple);transform:translateY(-2px)}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-height:150px;overflow-y:auto;padding:4px;background:#fbfaff;border-radius:16px}
+.emoji-grid button{font-size:26px;padding:6px;border-radius:12px;transition:.1s}
+.emoji-grid button:hover{background:#f0eaff;transform:scale(1.15)}
+.emoji-grid button.on{background:#e7dcff}
+.primary{
+  width:100%;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:900;font-size:18px;
+  padding:15px;border-radius:18px;box-shadow:var(--shadow-sm);transition:transform .12s;margin-top:6px;
+}
+.primary:hover{transform:translateY(-2px)}
+.primary:disabled{opacity:.5;transform:none}
+.hint{font-size:13px;color:var(--ink-soft);font-weight:600;margin-top:8px;text-align:center}
+.safe-note{background:#eafcf4;border-radius:14px;padding:11px 14px;font-size:13px;font-weight:700;color:#13895f;margin-top:14px;display:flex;gap:8px;align-items:flex-start}
+
+/* ============ DETAIL / COMMENTS ============ */
+.detail-media{border-radius:18px;overflow:hidden;background:var(--bg2);aspect-ratio:16/10;display:grid;place-items:center;margin-bottom:14px}
+.detail-media .emoji-art{font-size:110px}
+.detail-media iframe{width:100%;height:100%;border:0}
+.detail-media img{width:100%;height:100%;object-fit:cover}
+.cmt-list{display:flex;flex-direction:column;gap:10px;max-height:230px;overflow-y:auto;margin:6px 0 12px;padding-right:4px}
+.cmt{display:flex;gap:9px;align-items:flex-start;background:var(--bg);border-radius:16px;padding:10px 12px}
+.cmt .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:#fff;flex-shrink:0}
+.cmt .who{font-weight:800;font-size:13px}
+.cmt .txt{font-size:14px;font-weight:600;color:var(--ink);margin-top:1px}
+.stickers{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.stickers button{font-size:18px;background:var(--bg2);border-radius:999px;padding:6px 10px;font-weight:800;font-size:13px}
+.stickers button:hover{background:#e7dcff}
+.cmt-input{display:flex;gap:8px}
+.cmt-input input{flex:1;border:2px solid #eee;border-radius:14px;padding:11px 14px;font-size:15px;font-weight:600;background:#fbfaff}
+.cmt-input input:focus{outline:none;border-color:var(--purple)}
+.cmt-input button{background:var(--purple);color:#fff;font-weight:900;border-radius:14px;padding:0 18px;font-size:15px}
+
+/* ============ PROFILE ============ */
+.profile-head{display:flex;align-items:center;gap:18px;background:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow-sm);margin-bottom:16px;position:relative;overflow:hidden}
+.profile-head::after{content:"";position:absolute;inset:0;background:radial-gradient(300px 160px at 100% 0,#eee6ff,transparent);pointer-events:none}
+.profile-head .pav{width:84px;height:84px;border-radius:26px;display:grid;place-items:center;font-size:46px;background:linear-gradient(135deg,#fff0f8,#eef0ff);box-shadow:var(--shadow-sm)}
+.profile-head h2{margin:0;font-size:26px}
+.lvl-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+.lvl-pill{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-weight:900;font-size:13px;padding:5px 12px;border-radius:999px}
+.bar{flex:1;height:12px;background:#eee;border-radius:999px;overflow:hidden;max-width:220px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:999px;transition:width .6s}
+.stats{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat{flex:1;min-width:90px;background:#fff;border-radius:20px;padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat .n{font-size:26px;font-weight:900;line-height:1}
+.stat .l{font-size:12px;font-weight:700;color:var(--ink-soft);margin-top:4px}
+.badges{background:#fff;border-radius:24px;padding:18px;box-shadow:var(--shadow-sm);margin-bottom:16px}
+.badges h3{margin:0 0 12px;font-size:18px}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.bdg{text-align:center;background:var(--bg);border-radius:18px;padding:12px 6px;position:relative;transition:.15s}
+.bdg.locked{opacity:.4;filter:grayscale(1)}
+.bdg .e{font-size:32px}
+.bdg .n{font-size:11px;font-weight:800;margin-top:4px}
+.bdg.got{background:linear-gradient(135deg,#fff6db,#ffe6f2)}
+.section-title{font-size:20px;font-weight:900;margin:6px 4px 12px;display:flex;align-items:center;gap:8px}
+
+/* ============ ONBOARDING ============ */
+.ob-step{display:none}
+.ob-step.on{display:block}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.ob-dots i{width:8px;height:8px;border-radius:50%;background:#e0d8f0}
+.ob-dots i.on{background:var(--purple);width:22px;border-radius:999px}
+
+/* confetti */
+.confetti{position:fixed;top:-10px;width:12px;height:12px;z-index:200;border-radius:3px;pointer-events:none}
+
+/* nav bottom (mobile) */
+.botnav{display:none}
+
+@media(max-width:640px){
+  .hero h1{font-size:24px}
+  .hero .pin{font-size:48px}
+  .grid{grid-template-columns:1fr}
+  .fab span.lbl{display:none}
+  .fab{padding:18px;right:16px;bottom:84px}
+  .type-pick{grid-template-columns:repeat(5,1fr)}
+  .botnav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:55;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:2px solid #fce3f0;padding:8px 10px;justify-content:space-around}
+  .botnav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:11px;color:var(--ink-soft);padding:6px 16px;border-radius:14px}
+  .botnav button.on{color:var(--purple);background:#f3eeff}
+  .botnav .e{font-size:22px}
+  .wrap{padding-bottom:80px}
+}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+
+<header>
+  <div class="bar">
+    <div class="logo" onclick="go('feed')">
+      <div class="mark">✨</div><span>Spark<b>le</b></span>
+    </div>
+    <div class="spacer"></div>
+    <div class="coin" title="Sparks you earned!"><span class="big">⚡</span><span id="sparkCount">0</span></div>
+    <button class="me-btn" onclick="go('profile')">
+      <span id="navName">You</span>
+      <span class="av" id="navAvatar">🦊</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<button class="fab" onclick="openAdd()"><span class="plus">＋</span><span class="lbl">Add Project</span></button>
+
+<!-- bottom nav (mobile) -->
+<nav class="botnav">
+  <button id="bn-feed" class="on" onclick="go('feed')"><span class="e">🏠</span>Explore</button>
+  <button onclick="openAdd()"><span class="e">➕</span>Add</button>
+  <button id="bn-profile" onclick="go('profile')"><span class="e">⭐</span>Me</button>
+</nav>
+
+<!-- ===== ADD MODAL ===== -->
+<div class="scrim" id="addScrim">
+  <div class="modal">
+    <button class="x" onclick="close_('addScrim')">×</button>
+    <h2>Share your project! 🚀</h2>
+    <p class="sub">Show the world what you made. You'll earn ⚡ Sparks!</p>
+
+    <div class="field">
+      <label>What kind of project?</label>
+      <div class="type-pick" id="typePick">
+        <button class="tp on" data-t="art"><span class="e">🎨</span>Art</button>
+        <button class="tp" data-t="youtube"><span class="e">📺</span>YouTube</button>
+        <button class="tp" data-t="code"><span class="e">🕹️</span>Code/Game</button>
+        <button class="tp" data-t="video"><span class="e">🎬</span>Video</button>
+        <button class="tp" data-t="music"><span class="e">🎵</span>Music</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Give it a cool name</label>
+      <input type="text" id="pTitle" maxlength="50" placeholder="My amazing dragon drawing!" />
+    </div>
+
+    <div class="field">
+      <label>Tell us about it</label>
+      <textarea id="pDesc" maxlength="240" placeholder="I drew this with markers. It took me 2 hours!"></textarea>
+    </div>
+
+    <div class="field" id="linkField">
+      <label id="linkLabel">Paste a YouTube link 📺</label>
+      <input type="url" id="pLink" placeholder="https://youtube.com/watch?v=..." />
+      <div class="hint" id="linkHint">We'll show your video right here ✨</div>
+    </div>
+
+    <div class="field" id="emojiField" style="display:none">
+      <label>Pick a picture for your project</label>
+      <div class="emoji-grid" id="artEmojis"></div>
+    </div>
+
+    <button class="primary" id="postBtn" onclick="submitProject()">Post it! 🎉</button>
+
+    <div class="safe-note">🛡️ <span><b>Stay safe:</b> Never share your full name, school, address, or phone number. Be kind in everything you post!</span></div>
+  </div>
+</div>
+
+<!-- ===== DETAIL MODAL ===== -->
+<div class="scrim" id="detailScrim">
+  <div class="modal" id="detailModal"></div>
+</div>
+
+<!-- ===== ONBOARDING MODAL ===== -->
+<div class="scrim" id="obScrim">
+  <div class="modal">
+    <div class="ob-step on" id="ob1">
+      <div style="text-align:center">
+        <div style="font-size:64px">✨</div>
+        <h2>Welcome to Sparkle!</h2>
+        <p class="sub">The friendly place where kids show off their projects — art, videos, games, music and more. Let's set you up!</p>
+      </div>
+      <button class="primary" onclick="obNext(2)">Let's go! 🚀</button>
+    </div>
+    <div class="ob-step" id="ob2">
+      <h2>Pick your avatar 🦊</h2>
+      <p class="sub">Choose a fun character. No photos needed — stay anonymous & safe!</p>
+      <div class="emoji-grid" id="avatarGrid" style="max-height:170px"></div>
+      <button class="primary" onclick="obNext(3)">Next</button>
+    </div>
+    <div class="ob-step" id="ob3">
+      <h2>What should we call you?</h2>
+      <p class="sub">Use a nickname — never your real full name. 🛡️</p>
+      <div class="field"><input type="text" id="obName" maxlength="16" placeholder="StarMaker123" /></div>
+      <div class="field">
+        <label>How old are you?</label>
+        <select id="obAge" style="width:100%;border:2px solid #eee;border-radius:16px;padding:13px 15px;font-size:16px;font-weight:600;background:#fbfaff;color:var(--ink)">
+          <option value="">Choose...</option>
+        </select>
+      </div>
+      <button class="primary" onclick="finishOb()">Start Sparkling! ✨</button>
+    </div>
+    <div class="ob-dots"><i class="on" id="d1"></i><i id="d2"></i><i id="d3"></i></div>
+  </div>
+</div>
+
+<!-- ===== LEVEL UP TOAST ===== -->
+<div class="scrim" id="levelScrim">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div style="font-size:74px;animation:wiggle 1s infinite">🏆</div>
+    <h2 id="levelTitle">Level Up!</h2>
+    <p class="sub" id="levelMsg"></p>
+    <button class="primary" onclick="close_('levelScrim')">Awesome! 🎉</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   SPARKLE — kid project showcase (prototype, all client-side)
+   Data persists in localStorage so it feels real.
+========================================================= */
+
+const AVATARS = ["🦊","🐼","🦄","🐯","🐸","🐙","🦖","🐶","🐱","🦉","🐲","🦁","🐵","🐧","🦋","🐝","🦕","🐢","🐰","🐨","🦩","🦈","🐠","🌟"];
+const ART_EMOJIS = ["🎨","🖼️","🐉","🌈","🚀","🏰","🦄","🌸","⚽","🎸","🤖","🦕","🍕","🌋","🐳","🦊","🎮","🪐","🧁","🦋","🏎️","🎭","🌻","⭐"];
+const CATS = {
+  art:    {label:"Art",       e:"🎨"},
+  youtube:{label:"YouTube",   e:"📺"},
+  code:   {label:"Code/Game", e:"🕹️"},
+  video:  {label:"Video",     e:"🎬"},
+  music:  {label:"Music",     e:"🎵"},
+};
+const REACTS = ["🌟","❤️","🤩","👏"];
+const STICKERS = ["So cool! 🤩","Amazing! 🌟","Love it! ❤️","Wow! 👏","Great job! 🎉","Teach me! 🙌","You rock! 🤘","Beautiful! 🌈"];
+
+const LEVELS = [
+  {min:0,   name:"Sprout",     e:"🌱"},
+  {min:40,  name:"Explorer",   e:"🧭"},
+  {min:100, name:"Creator",    e:"🎨"},
+  {min:200, name:"Star Maker", e:"⭐"},
+  {min:350, name:"Legend",     e:"🏆"},
+  {min:600, name:"Superstar",  e:"🌟"},
+];
+const BADGES = [
+  {id:"first",  e:"🎉", n:"First Post",   test:s=>s.myPosts>=1},
+  {id:"three",  e:"🔥", n:"On a Roll",    test:s=>s.myPosts>=3},
+  {id:"five",   e:"🚀", n:"Super Maker",  test:s=>s.myPosts>=5},
+  {id:"artist", e:"🎨", n:"Artist",       test:s=>s.cats.has("art")},
+  {id:"coder",  e:"🕹️", n:"Coder",        test:s=>s.cats.has("code")},
+  {id:"tuber",  e:"📺", n:"YouTuber",     test:s=>s.cats.has("youtube")},
+  {id:"kind",   e:"💌", n:"Kind Friend",  test:s=>s.myComments>=3},
+  {id:"loved",  e:"❤️", n:"Loved",        test:s=>s.likesGot>=10},
+];
+
+/* ---------- state ---------- */
+let state = load();
+function load(){
+  try{ return JSON.parse(localStorage.getItem("sparkle")) || fresh(); }
+  catch(e){ return fresh(); }
+}
+function fresh(){
+  return { user:null, projects:seed(), sparks:0, likesGot:0, myComments:0 };
+}
+function save(){ localStorage.setItem("sparkle", JSON.stringify(state)); }
+
+let pendingType="art", pendingArtEmoji="🎨", pendingAvatar="🦊", obAvatar="🦊";
+
+/* ---------- seed demo content ---------- */
+function seed(){
+  return [
+    {id:id(),type:"art",title:"Rainbow Dragon 🐉",desc:"I drew this dragon with my new markers! He breathes rainbows instead of fire.",author:"DragonGirl",age:9,avatar:"🦄",art:"🐉",likes:14,reacts:{},comments:[{who:"PixelPete",av:"🤖",txt:"So cool! 🤩"},{who:"ArtKid",av:"🎨",txt:"Teach me how! 🙌"}]},
+    {id:id(),type:"code",title:"My First Platformer Game",desc:"I made a jumping game with Scratch! You collect stars and dodge the slimes.",author:"PixelPete",age:11,avatar:"🤖",art:"🕹️",likes:23,reacts:{},comments:[{who:"DragonGirl",av:"🦄",txt:"Amazing! 🌟"}]},
+    {id:id(),type:"youtube",title:"How I Built a Cardboard Robot",desc:"Watch my step-by-step video making a robot from boxes and tape!",author:"MakerMax",age:10,avatar:"🦖",art:"📺",link:"https://www.youtube.com/watch?v=dQw4w9WgXcQ",likes:31,reacts:{},comments:[]},
+    {id:id(),type:"music",title:"Space Adventure Song 🎵",desc:"I wrote a song about flying to the moon on my keyboard!",author:"MelodyMoon",age:8,avatar:"🦋",art:"🪐",likes:9,reacts:{},comments:[{who:"MakerMax",av:"🦖",txt:"Love it! ❤️"}]},
+    {id:id(),type:"art",title:"My Pixel City",desc:"A whole city I built block by block. It has a roller coaster!",author:"BlockBuddy",age:12,avatar:"🐼",art:"🏰",likes:18,reacts:{},comments:[]},
+    {id:id(),type:"video",title:"Slime Science Experiment",desc:"I made glow-in-the-dark slime and filmed the whole thing!",author:"ScienceSam",age:10,avatar:"🐙",art:"🌋",likes:27,reacts:{},comments:[{who:"PixelPete",av:"🤖",txt:"Wow! 👏"}]},
+  ];
+}
+function id(){ return Math.random().toString(36).slice(2,10); }
+
+/* ---------- helpers ---------- */
+function ytId(url){
+  if(!url) return null;
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+function levelFor(sp){
+  let lv=LEVELS[0],idx=0;
+  LEVELS.forEach((l,i)=>{ if(sp>=l.min){lv=l;idx=i;} });
+  const next=LEVELS[idx+1];
+  return {lv,idx,next,progress: next? Math.min(100,Math.round((sp-lv.min)/(next.min-lv.min)*100)) : 100};
+}
+function myStats(){
+  const mine = state.projects.filter(p=>p.author===state.user.name);
+  const cats = new Set(mine.map(p=>p.type));
+  const likesGot = mine.reduce((a,p)=>a+p.likes,0);
+  return {myPosts:mine.length,cats,likesGot,myComments:state.myComments,mine};
+}
+let curFilter="all", route="feed";
+
+/* =========================================================
+   ROUTER / RENDER
+========================================================= */
+function go(r){
+  route=r;
+  document.querySelectorAll(".botnav button").forEach(b=>b.classList.remove("on"));
+  const bn=document.getElementById("bn-"+r); if(bn)bn.classList.add("on");
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function render(){
+  syncTop();
+  route==="profile" ? renderProfile() : renderFeed();
+}
+function syncTop(){
+  if(!state.user) return;
+  document.getElementById("sparkCount").textContent = state.sparks;
+  document.getElementById("navName").textContent = state.user.name;
+  document.getElementById("navAvatar").textContent = state.user.avatar;
+}
+
+function renderFeed(){
+  const list = curFilter==="all" ? state.projects : state.projects.filter(p=>p.type===curFilter);
+  const chips = [["all","✨","All"]].concat(Object.entries(CATS).map(([k,v])=>[k,v.e,v.label]));
+  const app=document.getElementById("app");
+  app.innerHTML = `
+    <div class="hero">
+      <div style="flex:1">
+        <h1>Hi ${esc(state.user.name)}! ${state.user.avatar}</h1>
+        <p>Check out what other makers built — then share your own and earn ⚡ Sparks!</p>
+      </div>
+      <div class="pin">🎨</div>
+    </div>
+    <div class="chips">
+      ${chips.map(([k,e,l])=>`<button class="chip ${k===curFilter?'on':''}" data-c="${k}" onclick="setFilter('${k}')">${e} ${l}</button>`).join("")}
+    </div>
+    <div class="grid">
+      ${list.length? list.map(cardHTML).join("") : emptyHTML()}
+    </div>`;
+}
+function emptyHTML(){
+  return `<div class="empty"><div class="big">🔭</div><h3>No projects here yet</h3><p>Be the first to share something awesome in this category!</p></div>`;
+}
+function cardHTML(p){
+  const cat=CATS[p.type];
+  let thumb;
+  const yt = p.link && ytId(p.link);
+  if(yt){
+    thumb = `<img src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt="">
+             <div class="play-ov"><div class="pbtn">▶️</div></div>`;
+  } else {
+    thumb = `<div class="emoji-art">${p.art||cat.e}</div>`;
+  }
+  return `
+  <div class="card" onclick="openDetail('${p.id}')">
+    <div class="thumb">
+      ${thumb}
+      <div class="badge-cat">${cat.e} ${cat.label}</div>
+    </div>
+    <div class="body">
+      <h3>${esc(p.title)}</h3>
+      <p class="desc">${esc(p.desc)}</p>
+      <div class="author">
+        <span class="av">${p.avatar}</span>
+        <span>${esc(p.author)}</span><span class="age">· age ${p.age}</span>
+      </div>
+      <div class="actions" onclick="event.stopPropagation()">
+        <button class="react ${p._liked?'liked':''}" onclick="like('${p.id}',this)">
+          <span class="ic">🌟</span><span>${p.likes}</span>
+        </button>
+        <button class="comment-btn" onclick="openDetail('${p.id}')">💬 ${p.comments.length}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function setFilter(c){ curFilter=c; renderFeed(); }
+
+/* ---------- profile ---------- */
+function renderProfile(){
+  const s=myStats();
+  const L=levelFor(state.sparks);
+  const app=document.getElementById("app");
+  app.innerHTML=`
+    <div class="profile-head">
+      <div class="pav">${state.user.avatar}</div>
+      <div style="flex:1">
+        <h2>${esc(state.user.name)}</h2>
+        <div style="color:var(--ink-soft);font-weight:700">age ${state.user.age} · maker since today</div>
+        <div class="lvl-row">
+          <span class="lvl-pill">${L.lv.e} ${L.lv.name}</span>
+          <div class="bar"><i style="width:${L.progress}%"></i></div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-top:5px">
+          ${L.next? `${L.next.min-state.sparks} more ⚡ to reach ${L.next.e} ${L.next.name}` : "Max level — you're a legend! 🌟"}
+        </div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">${s.myPosts}</div><div class="l">Projects</div></div>
+      <div class="stat"><div class="n">⚡${state.sparks}</div><div class="l">Sparks</div></div>
+      <div class="stat"><div class="n">${s.likesGot}</div><div class="l">Stars got</div></div>
+      <div class="stat"><div class="n">${s.cats.size}</div><div class="l">Skills</div></div>
+    </div>
+    <div class="badges">
+      <h3>🏅 My Badges</h3>
+      <div class="badge-grid">
+        ${BADGES.map(b=>{const got=b.test(s);return `<div class="bdg ${got?'got':'locked'}"><div class="e">${b.e}</div><div class="n">${b.n}</div></div>`}).join("")}
+      </div>
+    </div>
+    <div class="section-title">🎨 My Projects</div>
+    <div class="grid">
+      ${s.mine.length? s.mine.map(cardHTML).join("") : `<div class="empty"><div class="big">🌱</div><h3>No projects yet!</h3><p>Tap the ＋ button to share your first creation and earn Sparks!</p></div>`}
+    </div>`;
+}
+
+/* =========================================================
+   LIKES
+========================================================= */
+function like(pid,btn){
+  const p=state.projects.find(x=>x.id===pid); if(!p)return;
+  p._liked=!p._liked;
+  p.likes += p._liked?1:-1;
+  if(p._liked){ addSparks(1); burst(btn,"🌟"); }
+  save();
+  if(btn){ btn.classList.toggle("liked",p._liked); btn.querySelector("span:last-child").textContent=p.likes; }
+  syncTop();
+}
+
+/* =========================================================
+   DETAIL + COMMENTS
+========================================================= */
+let curDetail=null;
+function openDetail(pid){
+  const p=state.projects.find(x=>x.id===pid); if(!p)return;
+  curDetail=pid;
+  const cat=CATS[p.type];
+  const yt=p.link&&ytId(p.link);
+  let media;
+  if(yt) media=`<iframe src="https://www.youtube.com/embed/${yt}" allowfullscreen></iframe>`;
+  else media=`<div class="emoji-art">${p.art||cat.e}</div>`;
+  document.getElementById("detailModal").innerHTML=`
+    <button class="x" onclick="close_('detailScrim')">×</button>
+    <div class="detail-media">${media}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span class="badge-cat" style="position:static">${cat.e} ${cat.label}</span>
+    </div>
+    <h2>${esc(p.title)}</h2>
+    <div class="author" style="margin:4px 0 10px">
+      <span class="av">${p.avatar}</span><span>${esc(p.author)}</span><span class="age">· age ${p.age}</span>
+    </div>
+    <p class="sub" style="color:var(--ink)">${esc(p.desc)}</p>
+    <div style="display:flex;gap:8px;margin:12px 0">
+      <button class="react ${p._liked?'liked':''}" onclick="like('${p.id}',this);refreshDetail()"><span class="ic">🌟</span><span>${p.likes}</span></button>
+      ${REACTS.slice(1).map(r=>`<button class="react" onclick="quickReact('${p.id}','${r}',this)"><span class="ic">${r}</span></button>`).join("")}
+    </div>
+    <div class="section-title" style="font-size:16px;margin:6px 0 8px">💬 Comments (${p.comments.length})</div>
+    <div class="cmt-list" id="cmtList">
+      ${p.comments.length? p.comments.map(c=>cmtHTML(c)).join("") : `<div style="color:var(--ink-soft);font-weight:600;font-size:14px;padding:6px">No comments yet — say something kind! 💛</div>`}
+    </div>
+    <div class="stickers">
+      ${STICKERS.slice(0,5).map(s=>`<button onclick="sendComment('${p.id}','${s.replace(/'/g,"")}')">${s}</button>`).join("")}
+    </div>
+    <div class="cmt-input">
+      <input id="cmtInput" maxlength="120" placeholder="Write something kind..." onkeydown="if(event.key==='Enter')sendComment('${p.id}')" />
+      <button onclick="sendComment('${p.id}')">Send</button>
+    </div>
+    <div class="safe-note" style="margin-top:12px">💛 <span>Be kind! Comments are for cheering each other on.</span></div>`;
+  document.getElementById("detailScrim").classList.add("show");
+}
+function refreshDetail(){ if(curDetail) openDetail(curDetail); }
+function cmtHTML(c){
+  return `<div class="cmt"><span class="av">${c.av}</span><div><div class="who">${esc(c.who)}</div><div class="txt">${esc(c.txt)}</div></div></div>`;
+}
+const BAD = ["stupid","dumb","hate","ugly","idiot","loser","shut up"];
+function cleanOk(t){ const low=t.toLowerCase(); return !BAD.some(w=>low.includes(w)); }
+function sendComment(pid,preset){
+  const p=state.projects.find(x=>x.id===pid); if(!p)return;
+  let txt = preset || document.getElementById("cmtInput").value.trim();
+  if(!txt) return;
+  if(!cleanOk(txt)){ alert("Let's keep Sparkle kind! 💛 Try saying something nice instead."); return; }
+  p.comments.push({who:state.user.name,av:state.user.avatar,txt});
+  state.myComments++;
+  addSparks(2);
+  save();
+  refreshDetail();
+  checkBadgesQuietly();
+}
+function quickReact(pid,emoji,btn){
+  addSparks(1); burst(btn,emoji); save(); syncTop();
+}
+
+/* =========================================================
+   ADD PROJECT
+========================================================= */
+function openAdd(){
+  if(!state.user){ openOb(); return; }
+  pendingType="art"; pendingArtEmoji="🎨";
+  document.getElementById("pTitle").value="";
+  document.getElementById("pDesc").value="";
+  document.getElementById("pLink").value="";
+  document.querySelectorAll("#typePick .tp").forEach(b=>b.classList.toggle("on",b.dataset.t==="art"));
+  buildArtEmojis();
+  updateAddFields();
+  document.getElementById("addScrim").classList.add("show");
+}
+document.getElementById("typePick").addEventListener("click",e=>{
+  const b=e.target.closest(".tp"); if(!b)return;
+  pendingType=b.dataset.t;
+  document.querySelectorAll("#typePick .tp").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+  updateAddFields();
+});
+function updateAddFields(){
+  const linkTypes={youtube:["Paste a YouTube link 📺","https://youtube.com/watch?v=...","We'll show your video right here ✨"],
+                   video:["Paste a video link (optional) 🎬","https://youtube.com/watch?v=...","Or just pick a picture below!"]};
+  const lf=document.getElementById("linkField"), ef=document.getElementById("emojiField");
+  if(pendingType==="youtube"){
+    lf.style.display="block"; ef.style.display="none";
+    document.getElementById("linkLabel").textContent=linkTypes.youtube[0];
+    document.getElementById("pLink").placeholder=linkTypes.youtube[1];
+    document.getElementById("linkHint").textContent=linkTypes.youtube[2];
+  } else if(pendingType==="video"){
+    lf.style.display="block"; ef.style.display="block";
+    document.getElementById("linkLabel").textContent=linkTypes.video[0];
+    document.getElementById("pLink").placeholder=linkTypes.video[1];
+    document.getElementById("linkHint").textContent=linkTypes.video[2];
+  } else {
+    lf.style.display="none"; ef.style.display="block";
+  }
+}
+function buildArtEmojis(){
+  const g=document.getElementById("artEmojis");
+  g.innerHTML=ART_EMOJIS.map(e=>`<button class="${e===pendingArtEmoji?'on':''}" onclick="pickArt('${e}',this)">${e}</button>`).join("");
+}
+function pickArt(e,btn){
+  pendingArtEmoji=e;
+  document.querySelectorAll("#artEmojis button").forEach(x=>x.classList.remove("on"));
+  btn.classList.add("on");
+}
+function submitProject(){
+  const title=document.getElementById("pTitle").value.trim();
+  const desc=document.getElementById("pDesc").value.trim();
+  const link=document.getElementById("pLink").value.trim();
+  if(!title){ alert("Give your project a name! ✏️"); return; }
+  if(pendingType==="youtube" && !ytId(link)){ alert("Please paste a valid YouTube link 📺"); return; }
+  if(!cleanOk(title) || !cleanOk(desc)){ alert("Let's keep it kind & friendly! 💛"); return; }
+  const p={
+    id:id(), type:pendingType, title, desc:desc||"Check out my project!",
+    author:state.user.name, age:state.user.age, avatar:state.user.avatar,
+    art:pendingArtEmoji, link: (pendingType==="youtube"||pendingType==="video")?link:"",
+    likes:0, reacts:{}, comments:[]
+  };
+  state.projects.unshift(p);
+  const before=levelFor(state.sparks).idx;
+  addSparks(10);
+  save();
+  close_("addScrim");
+  bigConfetti();
+  const after=levelFor(state.sparks).idx;
+  checkBadgesQuietly();
+  if(after>before){ showLevelUp(after); }
+  curFilter="all"; go("feed");
+}
+
+/* =========================================================
+   SPARKS / LEVELS / BADGES
+========================================================= */
+function addSparks(n){ state.sparks+=n; save(); syncTop(); }
+function showLevelUp(idx){
+  const L=LEVELS[idx];
+  document.getElementById("levelTitle").textContent=`Level Up! ${L.e}`;
+  document.getElementById("levelMsg").textContent=`You're now a ${L.name}! Keep sharing to climb higher.`;
+  document.getElementById("levelScrim").classList.add("show");
+  bigConfetti();
+}
+let shownBadges=new Set();
+function checkBadgesQuietly(){
+  const s=myStats();
+  BADGES.forEach(b=>{ if(b.test(s)) shownBadges.add(b.id); });
+}
+
+/* =========================================================
+   ONBOARDING
+========================================================= */
+function openOb(){
+  buildAvatarGrid();
+  const sel=document.getElementById("obAge");
+  if(sel.children.length<=1){ for(let a=6;a<=14;a++){const o=document.createElement("option");o.value=a;o.textContent=a+" years old";sel.appendChild(o);} }
+  document.getElementById("obScrim").classList.add("show");
+}
+function buildAvatarGrid(){
+  const g=document.getElementById("avatarGrid");
+  g.innerHTML=AVATARS.map(a=>`<button class="${a===obAvatar?'on':''}" onclick="pickAvatar('${a}',this)">${a}</button>`).join("");
+}
+function pickAvatar(a,btn){
+  obAvatar=a;
+  document.querySelectorAll("#avatarGrid button").forEach(x=>x.classList.remove("on"));
+  btn.classList.add("on");
+}
+function obNext(step){
+  document.querySelectorAll(".ob-step").forEach(s=>s.classList.remove("on"));
+  document.getElementById("ob"+step).classList.add("on");
+  document.querySelectorAll(".ob-dots i").forEach((d,i)=>d.classList.toggle("on",i<step));
+}
+function finishOb(){
+  const name=document.getElementById("obName").value.trim()||"Maker"+Math.floor(Math.random()*999);
+  const age=document.getElementById("obAge").value||10;
+  state.user={name,age:+age,avatar:obAvatar};
+  save();
+  close_("obScrim");
+  bigConfetti();
+  go("feed");
+}
+
+/* =========================================================
+   FX + UTILS
+========================================================= */
+function close_(idd){ document.getElementById(idd).classList.remove("show"); }
+function esc(s){ return (s+"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function burst(el,emoji){
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<6;i++){
+    const s=document.createElement("div");
+    s.textContent=emoji; s.style.cssText=`position:fixed;left:${r.left+r.width/2}px;top:${r.top}px;font-size:18px;z-index:300;pointer-events:none;transition:transform .7s ease-out,opacity .7s`;
+    document.body.appendChild(s);
+    requestAnimationFrame(()=>{ s.style.transform=`translate(${(Math.random()-.5)*80}px,${-40-Math.random()*50}px) rotate(${Math.random()*90}deg)`; s.style.opacity="0"; });
+    setTimeout(()=>s.remove(),700);
+  }
+}
+function bigConfetti(){
+  const colors=["#ff5fa2","#8a5cff","#3aa0ff","#27d2a0","#ffce3a","#ff8a3d"];
+  for(let i=0;i<70;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=colors[i%colors.length];
+    c.style.transform=`rotate(${Math.random()*360}deg)`;
+    if(Math.random()>.5)c.style.borderRadius="50%";
+    document.body.appendChild(c);
+    const dur=2+Math.random()*1.5, x=(Math.random()-.5)*200;
+    c.animate([{transform:`translate(0,0) rotate(0)`,opacity:1},{transform:`translate(${x}px,105vh) rotate(${Math.random()*720}deg)`,opacity:.9}],{duration:dur*1000,easing:"cubic-bezier(.3,.6,.5,1)"});
+    setTimeout(()=>c.remove(),dur*1000);
+  }
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+function boot(){
+  if(!state.user){ openOb(); }
+  else { go("feed"); }
+}
+boot();
+</script>
+</body>
+</html>
