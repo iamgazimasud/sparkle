@@ -13,5 +13,7 @@ export const config = {
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpg|jpeg|gif|png|svg|ico|webp|woff2?|ttf)).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",
+    // Clerk's auto-proxy path
+    "/__clerk/:path*",
   ],
 };

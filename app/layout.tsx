@@ -16,7 +16,15 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const body = (
+  // Wrap content with Clerk only when keys are configured; otherwise the app still
+  // renders (showing a "finish setup" screen). ClerkProvider lives inside <body>.
+  const content = clerkEnabledPublic ? (
+    <ClerkProvider appearance={{ variables: { colorPrimary: "#8a5cff" } }}>{children}</ClerkProvider>
+  ) : (
+    children
+  );
+
+  return (
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,15 +37,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="blob b1" /><div className="blob b2" />
         <div className="blob b3" /><div className="blob b4" />
-        {children}
+        {content}
       </body>
     </html>
-  );
-
-  // Only wrap with Clerk when keys are configured; otherwise the app still renders.
-  return clerkEnabledPublic ? (
-    <ClerkProvider appearance={{ variables: { colorPrimary: "#8a5cff" } }}>{body}</ClerkProvider>
-  ) : (
-    body
   );
 }

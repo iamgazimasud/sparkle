@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { UserButton } from "@clerk/nextjs";
 import { levelFor } from "@/lib/constants";
 import type { Project, User, Award } from "./types";
 import { api } from "./api";
@@ -103,6 +104,9 @@ export default function MainApp({
           <button className="me-btn" onClick={() => setRoute("profile")}>
             <span>{user.name}</span><span className="av">{user.avatar}</span>
           </button>
+          <div style={{ display: "flex", alignItems: "center" }} title="Account & sign out">
+            <UserButton />
+          </div>
         </div>
       </header>
 
