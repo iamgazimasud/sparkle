@@ -5,6 +5,29 @@ import type { Project, User } from "./types";
 import { api } from "./api";
 import ProjectCard from "./ProjectCard";
 
+function ProCard() {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  async function go() {
+    setBusy(true); setMsg("");
+    try {
+      const { url } = await api.startUpgrade();
+      window.location.href = url;
+    } catch (e) { setMsg((e as Error).message); setBusy(false); }
+  }
+  return (
+    <div className="pro-card">
+      <div style={{ fontSize: 40 }}>✨</div>
+      <h3>Sparkle Pro</h3>
+      <p>Unlock a glowing <b>PRO</b> badge, extra avatars, bigger photo uploads, and help keep Sparkle safe & ad-free.</p>
+      {msg && <div className="err" style={{ marginTop: 8 }}>{msg}</div>}
+      <button className="primary" disabled={busy} onClick={go} style={{ background: "linear-gradient(135deg,#ffce3a,#ff8a3d)", color: "#5a3a00" }}>
+        {busy ? "Opening..." : "Go Pro ✨"}
+      </button>
+    </div>
+  );
+}
+
 export default function Profile({
   user,
   onOpen,
@@ -54,6 +77,7 @@ export default function Profile({
           <div style={{ color: "var(--ink-soft)", fontWeight: 700 }}>age {user.age} · maker</div>
           <div className="lvl-row">
             <span className="lvl-pill">{L.lv.e} {L.lv.name}</span>
+            {user.plan === "pro" && <span className="pro-pill">✨ PRO</span>}
             <div className="pbar"><i style={{ width: `${L.progress}%` }} /></div>
           </div>
           <div style={{ fontSize: 12, color: "var(--ink-soft)", fontWeight: 700, marginTop: 5 }}>
@@ -83,6 +107,8 @@ export default function Profile({
           ))}
         </div>
       </div>
+
+      {user.plan !== "pro" && <ProCard />}
 
       <div className="section-title">🎨 My Projects</div>
       {loading ? (

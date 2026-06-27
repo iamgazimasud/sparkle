@@ -11,6 +11,7 @@ export default function AuthModal({ onDone }: { onDone: (u: User) => void }) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [pin, setPin] = useState("");
+  const [email, setEmail] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -20,7 +21,7 @@ export default function AuthModal({ onDone }: { onDone: (u: User) => void }) {
     if (!/^\d{4}$/.test(pin)) return setErr("Your secret PIN must be 4 numbers.");
     setBusy(true);
     try {
-      const u = await api.signup({ name: name.trim(), pin, age: Number(age) || 10, avatar });
+      const u = await api.signup({ name: name.trim(), pin, age: Number(age) || 10, avatar, email: email.trim() || undefined });
       onDone(u);
     } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   }
@@ -89,6 +90,12 @@ export default function AuthModal({ onDone }: { onDone: (u: User) => void }) {
                   <label>Secret PIN (4 numbers — remember it!)</label>
                   <input type="password" inputMode="numeric" maxLength={4} value={pin}
                     onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} placeholder="••••" />
+                </div>
+                <div className="field">
+                  <label>Grown-up&apos;s email <span style={{ color: "var(--ink-soft)", fontWeight: 600 }}>(optional)</span></label>
+                  <input type="text" inputMode="email" value={email}
+                    onChange={(e) => setEmail(e.target.value)} placeholder="mom-or-dad@email.com" />
+                  <div className="hint">A parent&apos;s email for receipts &amp; account help. Never shown to other kids.</div>
                 </div>
                 <button className="primary" disabled={busy} onClick={join}>
                   {busy ? "Creating..." : "Start Sparkling! ✨"}

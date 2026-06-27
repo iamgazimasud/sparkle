@@ -18,7 +18,9 @@
     "@prisma/client": "^6.2.1",
     "next": "15.1.6",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "resend": "^6.16.0",
+    "stripe": "^22.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

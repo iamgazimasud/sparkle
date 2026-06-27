@@ -144,6 +144,12 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop
 .lvl-pill{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-weight:900;font-size:13px;padding:5px 12px;border-radius:999px}
 .pbar{flex:1;height:12px;background:#eee;border-radius:999px;overflow:hidden;max-width:220px}
 .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:999px;transition:width .6s}
+.pro-pill{background:linear-gradient(135deg,#ffce3a,#ff8a3d);color:#5a3a00;font-weight:900;font-size:12px;padding:5px 10px;border-radius:999px;box-shadow:var(--shadow-sm)}
+.pro-card{background:linear-gradient(135deg,#fff6db,#ffe6f2);border-radius:24px;padding:22px;box-shadow:var(--shadow-sm);margin-bottom:16px;text-align:center}
+.pro-card h3{margin:6px 0 6px;font-size:22px}
+.pro-card p{margin:0 0 6px;color:var(--ink-soft);font-weight:700;font-size:14px}
+.pro-card .primary{max-width:260px;margin:10px auto 0}
+
 .stats{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .stat{flex:1;min-width:90px;background:#fff;border-radius:20px;padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
 .stat .n{font-size:26px;font-weight:900;line-height:1}

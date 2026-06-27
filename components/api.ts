@@ -12,7 +12,7 @@ export const api = {
     const d = await r.json();
     return d.user;
   },
-  async signup(input: { name: string; pin: string; age: number; avatar: string }): Promise<User> {
+  async signup(input: { name: string; pin: string; age: number; avatar: string; email?: string }): Promise<User> {
     const d = await jsonOrThrow(await post("/api/auth", { action: "signup", ...input }));
     return d.user;
   },
@@ -41,6 +41,9 @@ export const api = {
   async comment(id: string, text: string): Promise<Comment> {
     const d = await jsonOrThrow(await post(`/api/projects/${id}/comments`, { text }));
     return d.comment;
+  },
+  async startUpgrade(): Promise<{ url: string }> {
+    return jsonOrThrow(await post("/api/stripe/checkout", {}));
   },
 };
 

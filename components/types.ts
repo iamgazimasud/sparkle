@@ -1,4 +1,12 @@
-export type User = { id: string; name: string; age: number; avatar: string; sparks: number };
+export type User = {
+  id: string;
+  name: string;
+  age: number;
+  avatar: string;
+  sparks: number;
+  email: string | null;
+  plan: string;
+};
 
 export type AwardPart = { label: string; points: number; emoji: string };
 export type Award = { total: number; parts: AwardPart[] };

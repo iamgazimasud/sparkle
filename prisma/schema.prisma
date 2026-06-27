@@ -20,6 +20,12 @@ model User {
   sparks    Int      @default(0)
   createdAt DateTime @default(now())
 
+  // Parent/guardian email — used for billing receipts & account recovery.
+  email            String? @unique
+  // Subscription: "free" | "pro". Set by the Stripe webhook.
+  plan             String  @default("free")
+  stripeCustomerId String? @unique
+
   projects Project[]
   comments Comment[]
   likes    Like[]
