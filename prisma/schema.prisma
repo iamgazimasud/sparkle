@@ -31,9 +31,17 @@ model User {
   plan             String  @default("free")
   stripeCustomerId String? @unique
 
-  projects Project[]
-  comments Comment[]
-  likes    Like[]
+  // Safety & moderation
+  isBanned   Boolean   @default(false) // banned by a moderator
+  parentEmail String?  // guardian email captured at consent
+  consentAt  DateTime? // parental consent timestamp (COPPA). Null = not yet consented.
+
+  projects      Project[]
+  comments      Comment[]
+  likes         Like[]
+  reportsMade   Report[]  @relation("reporter")
+  blocksMade    Block[]   @relation("blocker")
+  blocksAgainst Block[]   @relation("blocked")
 }
 
 model Project {
@@ -44,6 +52,7 @@ model Project {
   cover     String // emoji cover
   link      String? // youtube / video url
   image     String? // uploaded image (data URL, compressed)
+  hidden    Boolean  @default(false) // hidden by a moderator
   createdAt DateTime @default(now())
 
   authorId String
@@ -51,6 +60,7 @@ model Project {
 
   comments Comment[]
   likes    Like[]
+  reports  Report[]
 
   @@index([type])
   @@index([createdAt])
@@ -59,14 +69,50 @@ model Project {
 model Comment {
   id        String   @id @default(cuid())
   text      String
+  hidden    Boolean  @default(false) // hidden by a moderator
   createdAt DateTime @default(now())
 
   authorId  String
   author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reports   Report[]
 
   @@index([projectId])
+}
+
+// A safety report filed by a kid against a project, comment, or user.
+model Report {
+  id         String   @id @default(cuid())
+  reason     String // why it was reported
+  status     String   @default("open") // open | resolved | dismissed
+  createdAt  DateTime @default(now())
+
+  reporterId String
+  reporter   User   @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  // What was reported (one of these is set)
+  projectId  String?
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  commentId  String?
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  targetUserId String? // reporting a user directly
+
+  @@index([status])
+}
+
+// One kid blocking another — hides the blocked user's content from the blocker.
+model Block {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  blockerId String
+  blocker   User   @relation("blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User   @relation("blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
 }
 
 model Like {

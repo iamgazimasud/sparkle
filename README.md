@@ -64,16 +64,29 @@ app/
     projects/[id]/like/route.ts      Toggle a like
     projects/[id]/comments/route.ts  Add a comment
     stripe/checkout, stripe/webhook  Sparkle Pro subscription
-components/             Client UI (SparkleApp gate, MainApp, Feed, Profile, modals)
-lib/                    db, auth (Clerk), clerk, stripe, email, constants, helpers
+    report/route.ts     File a safety report (project/comment)
+    block/route.ts      Block / unblock a maker
+    consent/route.ts    Record parental consent
+    admin/reports/...   Moderation queue (admin only)
+components/             Client UI (SparkleApp gate, MainApp, Feed, Profile, modals, ConsentGate, AdminDashboard)
+lib/                    db, auth (Clerk), clerk, admin, guard, stripe, email, constants, helpers
 middleware.ts           Clerk middleware (gated)
 prisma/                 schema + migration + seed
 ```
 
-## ⚠️ Before real kids use it (important)
+## 🛡️ Safety & moderation (built in)
 
-This is a complete, working app — but a public community for children has legal and
-safety duties (COPPA in the US, GDPR-K in the EU). Before launching to real kids, add:
-**human moderation** of posts/comments, **parental consent**, a **report/block**
-system, and a clear **privacy policy**. The kindness filter here is a helpful start,
-not a substitute for human review.
+A public community for children has legal & safety duties (COPPA in the US, GDPR-K in
+the EU). Sparkle now ships with:
+
+- **Parental consent gate** — under-13 makers can browse, but must get a guardian's
+  email + permission before posting/commenting (enforced server-side too).
+- **Report** any project or comment (kid-friendly reasons) → goes to a moderation queue.
+- **Block** a maker — hides all their content from you, both directions.
+- **Moderation dashboard** at `/admin` (for emails in `ADMIN_EMAILS`) — review reports
+  and **hide content** or **ban users**. Hidden/banned/blocked content disappears from
+  the feed automatically.
+- **Kindness filter** on all text as a first line of defense.
+
+> Still recommended before a big public launch: a lawyer's review of the consent flow &
+> policies, and a real human moderation rota. The tools are here — the process is yours.

@@ -5,25 +5,34 @@ import type { Project } from "./types";
 import { api } from "./api";
 import { burst } from "./fx";
 
+const REASONS = ["It's mean or bullying", "It's not safe for kids", "It's spam", "Something else"];
+
+type ReportTarget = { kind: "project" | "comment"; id: string; label: string };
+
 export default function DetailModal({
   project,
-  meName,
+  myId,
   onClose,
   onLike,
   onCommented,
   onInspired,
+  onBlocked,
 }: {
   project: Project;
-  meName: string;
+  myId: string;
   onClose: () => void;
   onLike: (p: Project, btn: HTMLElement) => void;
   onCommented: (p: Project) => void;
   onInspired: (type: string) => void;
+  onBlocked: () => void;
 }) {
   const [text, setText] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [notice, setNotice] = useState("");
   const cat = CATS[project.type] ?? { e: "✨", label: "Project" };
+  const isMine = project.author.id === myId;
 
   async function send(preset?: string) {
     const value = preset || text.trim();
@@ -36,6 +45,26 @@ export default function DetailModal({
       setText("");
       onCommented(project);
     } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function submitReport(reason: string) {
+    if (!reportTarget) return;
+    try {
+      await api.report(
+        reportTarget.kind === "project"
+          ? { projectId: reportTarget.id, reason }
+          : { commentId: reportTarget.id, reason }
+      );
+      setReportTarget(null);
+      setNotice("Thanks for telling us! 💛 A grown-up will take a look.");
+    } catch (e) { setErr((e as Error).message); }
+  }
+
+  async function blockMaker() {
+    try {
+      await api.block(project.author.id, "block");
+      onBlocked();
+    } catch (e) { setErr((e as Error).message); }
   }
 
   return (
@@ -85,7 +114,14 @@ export default function DetailModal({
             project.comments.map((c) => (
               <div key={c.id} className="cmt">
                 <span className="av">{c.author.avatar}</span>
-                <div><div className="who">{c.author.name}</div><div className="txt">{c.text}</div></div>
+                <div style={{ flex: 1 }}>
+                  <div className="who">{c.author.name}</div>
+                  <div className="txt">{c.text}</div>
+                </div>
+                {c.authorId !== myId && (
+                  <button className="flag" title="Report this comment"
+                    onClick={() => setReportTarget({ kind: "comment", id: c.id, label: "comment" })}>🚩</button>
+                )}
               </div>
             ))
           ) : (
@@ -96,6 +132,7 @@ export default function DetailModal({
         </div>
 
         {err && <div className="err">{err}</div>}
+        {notice && <div className="safe-note" style={{ marginTop: 0 }}>✅ <span>{notice}</span></div>}
         <div className="stickers">
           {STICKERS.slice(0, 5).map((s) => (
             <button key={s} onClick={() => send(s)} disabled={busy}>{s}</button>
@@ -108,6 +145,29 @@ export default function DetailModal({
           <button onClick={() => send()} disabled={busy}>Send</button>
         </div>
         <div className="safe-note" style={{ marginTop: 12 }}>💛 <span>Be kind! Comments are for cheering each other on.</span></div>
+
+        {/* Safety controls (not shown on your own project) */}
+        {!isMine && (
+          <div className="safety-row">
+            <button onClick={() => setReportTarget({ kind: "project", id: project.id, label: "project" })}>🚩 Report this project</button>
+            <button onClick={blockMaker}>🚫 Block {project.author.name}</button>
+          </div>
+        )}
+
+        {/* Reason picker */}
+        {reportTarget && (
+          <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) setReportTarget(null); }}>
+            <div className="modal" style={{ maxWidth: 360 }} onClick={(e) => e.stopPropagation()}>
+              <h2 style={{ fontSize: 20 }}>Tell a grown-up 🛡️</h2>
+              <p className="sub">What&apos;s wrong with this {reportTarget.label}?</p>
+              {REASONS.map((r) => (
+                <button key={r} className="reason-btn" onClick={() => submitReport(r)}>{r}</button>
+              ))}
+              <button className="logout" style={{ display: "block", margin: "10px auto 0" }}
+                onClick={() => setReportTarget(null)}>Cancel</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

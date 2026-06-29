@@ -8,6 +8,7 @@ import { COMMUNITY } from "@/lib/score";
 export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Please log in first." }, { status: 401 });
+  if (user.isBanned) return NextResponse.json({ error: "Your account is suspended." }, { status: 403 });
   const { id } = await ctx.params;
 
   const project = await prisma.project.findUnique({ where: { id }, select: { authorId: true } });

@@ -3,11 +3,16 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { isKind, SPARKS } from "@/lib/constants";
 import { COMMUNITY } from "@/lib/score";
+import { interactionBlock } from "@/lib/guard";
 
 // POST /api/projects/[id]/comments -> add a comment
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Please log in first." }, { status: 401 });
+
+  const block = interactionBlock(user);
+  if (block) return NextResponse.json({ error: block.error, code: block.code }, { status: block.status });
+
   const { id } = await ctx.params;
 
   const body = await req.json().catch(() => ({}));
@@ -37,6 +42,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       id: comment.id,
       text: comment.text,
       author: comment.author,
+      authorId: user.id,
       createdAt: comment.createdAt.toISOString(),
     },
   });

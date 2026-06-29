@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getProjects } from "@/lib/shape";
 import { isKind, ytId, CATS, ART_EMOJIS } from "@/lib/constants";
 import { scoreNewProject } from "@/lib/score";
+import { interactionBlock } from "@/lib/guard";
 
 // GET /api/projects?type=art&author=<id>
 export async function GET(req: Request) {
@@ -19,6 +20,9 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Please log in first." }, { status: 401 });
+
+  const block = interactionBlock(user);
+  if (block) return NextResponse.json({ error: block.error, code: block.code }, { status: block.status });
 
   const body = await req.json().catch(() => ({}));
   const type = String(body.type || "");

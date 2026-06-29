@@ -1,4 +1,5 @@
 import type { User } from "@prisma/client";
+import { isAdminUser } from "./admin";
 
 // Shape sent to the browser — never includes pinHash or Stripe internals.
 export type PublicUser = {
@@ -9,6 +10,9 @@ export type PublicUser = {
   sparks: number;
   email: string | null;
   plan: string;
+  consented: boolean; // parental consent given (or 13+)
+  isAdmin: boolean;
+  isBanned: boolean;
 };
 
 export function publicUser(u: User): PublicUser {
@@ -20,5 +24,8 @@ export function publicUser(u: User): PublicUser {
     sparks: u.sparks,
     email: u.email,
     plan: u.plan,
+    consented: u.age >= 13 || !!u.consentAt,
+    isAdmin: isAdminUser(u),
+    isBanned: u.isBanned,
   };
 }

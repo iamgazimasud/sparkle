@@ -6,6 +6,7 @@ import { api } from "./api";
 import MainApp from "./MainApp";
 import Landing from "./Landing";
 import Onboarding from "./Onboarding";
+import ConsentGate from "./ConsentGate";
 
 export default function SparkleApp({
   clerkEnabled,
@@ -38,6 +39,7 @@ function ClerkGate({
   const { signOut } = useClerk();
   const [profile, setProfile] = useState<User | null>(initialUser);
   const [checking, setChecking] = useState(false);
+  const [consentSkipped, setConsentSkipped] = useState(false);
 
   // Signed in (per Clerk) but no profile loaded yet -> fetch it.
   useEffect(() => {
@@ -52,12 +54,20 @@ function ClerkGate({
     await signOut();
   }
 
-  // We already know who they are (from the server) — go straight in, no flash.
-  if (profile) return <MainApp profile={profile} initialProjects={initialProjects} onLogout={logout} />;
-  if (!isLoaded) return <Spinner />;
-  if (!isSignedIn) return <Landing />;
-  if (checking) return <Spinner />;
-  return <Onboarding onDone={setProfile} />;
+  if (!profile) {
+    if (!isLoaded) return <Spinner />;
+    if (!isSignedIn) return <Landing />;
+    if (checking) return <Spinner />;
+    return <Onboarding onDone={setProfile} />;
+  }
+
+  // Under-13 makers must get a grown-up's permission before they can post.
+  // They may "look around" (consentSkipped) but posting is blocked server-side too.
+  if (!profile.consented && !consentSkipped) {
+    return <ConsentGate onConsented={setProfile} onSkip={() => setConsentSkipped(true)} />;
+  }
+
+  return <MainApp profile={profile} initialProjects={initialProjects} onLogout={logout} />;
 }
 
 function SetupNotice() {

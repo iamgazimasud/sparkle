@@ -55,8 +55,10 @@ This is not optional once real children use it:
 - **Parental consent** before kids under 13 sign up (COPPA in the US, GDPR-K in the EU).
 - A reviewed **Privacy Policy** & **Terms** (drafts are live at `/privacy` and `/terms` —
   have a lawyer check them).
-- **Human moderation** of posts/comments + a **report/block** button.
-- I can build the moderation tools and a parent-consent step next — just ask.
+- **Human moderation** of posts/comments + a **report/block** button. ✅ **Built** —
+  report/block are live, and moderators (set via `ADMIN_EMAILS`) review reports at `/admin`.
+- **Parental consent** for under-13. ✅ **Built** — a consent gate blocks posting until a
+  guardian approves. Have a lawyer review the exact flow/wording for your jurisdiction.
 
 ---
 
@@ -73,6 +75,7 @@ This is not optional once real children use it:
 | `STRIPE_WEBHOOK_SECRET` | 5 | for payments |
 | `RESEND_API_KEY` | 6 | for emails |
 | `EMAIL_FROM` | 6 | for emails |
+| `ADMIN_EMAILS` | — | who can open `/admin` (your email) |
 
 > The app boots **without** Clerk keys too — it just shows a "finish setup" screen
 > until you add them. Stripe/Resend stay off until their keys are added.

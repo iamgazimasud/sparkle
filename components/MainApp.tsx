@@ -100,6 +100,9 @@ export default function MainApp({
             <div className="mark">✨</div><span>Spark<b>le</b></span>
           </div>
           <div className="spacer" />
+          {user.isAdmin && (
+            <a className="ghost-btn" href="/admin" title="Moderation dashboard">🛡️ Admin</a>
+          )}
           <div className="coin" title="Sparks you earned!"><span className="big">⚡</span><span>{user.sparks}</span></div>
           <button className="me-btn" onClick={() => setRoute("profile")}>
             <span>{user.name}</span><span className="av">{user.avatar}</span>
@@ -143,11 +146,12 @@ export default function MainApp({
       {detail && (
         <DetailModal
           project={detail}
-          meName={user.name}
+          myId={user.id}
           onClose={() => setDetail(null)}
           onLike={like}
           onCommented={onCommented}
           onInspired={(type) => openAdd(type)}
+          onBlocked={() => { setDetail(null); changeFilter(filter); }}
         />
       )}
 

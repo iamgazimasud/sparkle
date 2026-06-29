@@ -6,6 +6,9 @@ export type User = {
   sparks: number;
   email: string | null;
   plan: string;
+  consented: boolean;
+  isAdmin: boolean;
+  isBanned: boolean;
 };
 
 export type AwardPart = { label: string; points: number; emoji: string };
@@ -15,6 +18,7 @@ export type Comment = {
   id: string;
   text: string;
   author: { name: string; avatar: string };
+  authorId: string;
   createdAt: string;
 };
 

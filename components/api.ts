@@ -37,6 +37,23 @@ export const api = {
   async startUpgrade(): Promise<{ url: string }> {
     return jsonOrThrow(await post("/api/stripe/checkout", {}));
   },
+  async report(input: { projectId?: string; commentId?: string; targetUserId?: string; reason: string }) {
+    return jsonOrThrow(await post("/api/report", input));
+  },
+  async block(userId: string, action: "block" | "unblock") {
+    return jsonOrThrow(await post("/api/block", { userId, action }));
+  },
+  async consent(parentEmail: string): Promise<User> {
+    const d = await jsonOrThrow(await post("/api/consent", { parentEmail }));
+    return d.user;
+  },
+  async adminReports(status = "open") {
+    const r = await fetch(`/api/admin/reports?status=${status}`);
+    return jsonOrThrow(r);
+  },
+  async adminAct(reportId: string, action: string) {
+    return jsonOrThrow(await post(`/api/admin/reports/${reportId}`, { action }));
+  },
 };
 
 function post(url: string, body: unknown) {
