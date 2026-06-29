@@ -1,16 +1,23 @@
 "use client";
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
-import { levelFor } from "@/lib/constants";
+import { levelFor, CATS } from "@/lib/constants";
 import type { FeedItem, Project, User, Award } from "./types";
 import { api } from "./api";
 import { confetti } from "./fx";
 import Feed from "./Feed";
+import Gallery from "./Gallery";
 import Profile from "./Profile";
 import AddModal from "./AddModal";
 import DetailModal from "./DetailModal";
 
-// The signed-in app. Auth/profile gating lives in SparkleApp (the Clerk gate).
+const CHIPS: [string, string, string][] = [
+  ["all", "✨", "All"],
+  ...Object.entries(CATS).map(([k, v]) => [k, v.e, v.label] as [string, string, string]),
+];
+
+type Route = "gallery" | "feed" | "profile";
+
 export default function MainApp({
   profile,
   initialFeed,
@@ -22,7 +29,7 @@ export default function MainApp({
 }) {
   const [user, setUser] = useState<User>(profile);
   const [feed, setFeed] = useState<FeedItem[]>(initialFeed);
-  const [route, setRoute] = useState<"feed" | "profile">("feed");
+  const [route, setRoute] = useState<Route>("gallery");
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
 
@@ -32,15 +39,16 @@ export default function MainApp({
   const [levelUp, setLevelUp] = useState<{ e: string; name: string } | null>(null);
   const [award, setAward] = useState<Award | null>(null);
 
-  // Update a project everywhere it appears in the feed (a post + any re-shares).
+  // The grid gallery shows original posts (not re-shares), derived from the feed.
+  const projects = feed.filter((it) => it.id.startsWith("post:")).map((it) => it.project);
+
   function patch(updated: Project) {
     setFeed((items) => items.map((it) => (it.project.id === updated.id ? { ...it, project: { ...updated } } : it)));
     setDetail((d) => (d && d.id === updated.id ? { ...updated } : d));
   }
 
   async function refreshFeed(f = filter) {
-    const items = await api.feed(f);
-    setFeed(items);
+    setFeed(await api.feed(f));
   }
 
   async function changeFilter(c: string) {
@@ -78,7 +86,7 @@ export default function MainApp({
       const res = await api.toggleShare(p.id);
       patch({ ...p, shared: res.shared, shares: res.shares });
       if (res.shared) bumpSparks(1);
-      await refreshFeed(); // reflect the new "shared by you" entry in the timeline
+      await refreshFeed();
     } catch { patch(p); }
   }
 
@@ -97,7 +105,6 @@ export default function MainApp({
     setFeed((items) => [{ id: `post:${p.id}`, project: p }, ...items.filter((it) => it.project.id !== p.id)]);
     setAddOpen(false);
     setFilter("all");
-    setRoute("feed");
     confetti();
     setAward(earned);
     bumpSparks(earned.total);
@@ -109,11 +116,13 @@ export default function MainApp({
     setAddOpen(true);
   }
 
+  const browsing = route === "gallery" || route === "feed";
+
   return (
     <>
       <header>
         <div className="bar">
-          <div className="logo" onClick={() => setRoute("feed")}>
+          <div className="logo" onClick={() => setRoute("gallery")}>
             <div className="mark">✨</div><span>Spark<b>le</b></span>
           </div>
           <div className="spacer" />
@@ -129,20 +138,41 @@ export default function MainApp({
       </header>
 
       <main className="wrap">
-        {route === "feed" ? (
-          <Feed
-            user={user}
-            items={feed}
-            filter={filter}
-            setFilter={changeFilter}
-            loading={loading}
-            onOpen={setDetail}
-            onLike={like}
-            onShare={share}
-            onComment={comment}
-          />
-        ) : (
+        {route === "profile" ? (
           <Profile user={user} onOpen={setDetail} onLike={like} onLogout={onLogout} />
+        ) : (
+          <>
+            <div className="hero">
+              <div style={{ flex: 1 }}>
+                <h1>Hi {user.name}! {user.avatar}</h1>
+                <p>{route === "feed"
+                  ? "See what makers are up to — like, comment & share to your feed! 🔁"
+                  : "Browse cool projects and get inspired to make your own! ✨"}</p>
+              </div>
+              <div className="pin">🎨</div>
+            </div>
+
+            <div className="tabs view-tabs">
+              <button className={route === "gallery" ? "on" : ""} onClick={() => setRoute("gallery")}>🖼️ Gallery</button>
+              <button className={route === "feed" ? "on" : ""} onClick={() => setRoute("feed")}>📰 Feed</button>
+            </div>
+
+            <div className="chips">
+              {CHIPS.map(([k, e, l]) => (
+                <button key={k} className={`chip ${k === filter ? "on" : ""}`} data-c={k} onClick={() => changeFilter(k)}>
+                  {e} {l}
+                </button>
+              ))}
+            </div>
+
+            {route === "gallery" ? (
+              <Gallery user={user} projects={projects} loading={loading} onOpen={setDetail} onLike={like} />
+            ) : (
+              <div className="feed-wrap">
+                <Feed user={user} items={feed} loading={loading} onOpen={setDetail} onLike={like} onShare={share} onComment={comment} />
+              </div>
+            )}
+          </>
         )}
       </main>
 
@@ -151,8 +181,11 @@ export default function MainApp({
       </button>
 
       <nav className="botnav">
+        <button className={route === "gallery" ? "on" : ""} onClick={() => setRoute("gallery")}>
+          <span className="e">🖼️</span>Gallery
+        </button>
         <button className={route === "feed" ? "on" : ""} onClick={() => setRoute("feed")}>
-          <span className="e">🏠</span>Feed
+          <span className="e">📰</span>Feed
         </button>
         <button onClick={() => openAdd()}><span className="e">➕</span>Add</button>
         <button className={route === "profile" ? "on" : ""} onClick={() => setRoute("profile")}>

@@ -93,6 +93,17 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop
 .link-card .lc-domain{font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .link-card .lc-open{font-weight:900;font-size:13px;color:var(--purple);white-space:nowrap}
 
+/* shared social/video link card */
+.link-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#f3eeff,#eef4ff);border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-sm);transition:transform .12s}
+.link-card:hover{transform:translateY(-2px)}
+.link-card.big{padding:18px 18px;margin-bottom:0}
+.link-card .lc-emoji{font-size:32px;flex-shrink:0}
+.link-card .lc-body{flex:1;min-width:0}
+.link-card .lc-label{font-weight:800;font-size:15px}
+.link-card .lc-domain{font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-card .lc-open{font-weight:800;font-size:13px;color:var(--purple);background:#fff;padding:7px 12px;border-radius:999px;flex-shrink:0}
+.view-tabs{margin-top:2px}
+
 /* ===== Facebook-style newsfeed ===== */
 .feed-wrap{max-width:600px;margin:0 auto}
 .feed{display:flex;flex-direction:column;gap:18px}
