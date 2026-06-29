@@ -1,5 +1,5 @@
 "use client";
-import { CATS } from "@/lib/constants";
+import { CATS, linkInfo } from "@/lib/constants";
 import type { Project } from "./types";
 import { burst } from "./fx";
 
@@ -26,7 +26,7 @@ export default function ProjectCard({
           /* eslint-disable-next-line @next/next/no-img-element */
           <img src={p.image} alt={p.title} />
         ) : (
-          <div className="emoji-art">{p.cover || cat.e}</div>
+          <div className="emoji-art">{(p.link && linkInfo(p.link)?.emoji) || p.cover || cat.e}</div>
         )}
         <div className="badge-cat">{cat.e} {cat.label}</div>
       </div>

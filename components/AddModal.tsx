@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { CATS, ART_EMOJIS, ytId } from "@/lib/constants";
+import { CATS, ART_EMOJIS, isHttpUrl } from "@/lib/constants";
 import type { Project, Award } from "./types";
 import { api } from "./api";
 
@@ -38,7 +38,7 @@ export default function AddModal({
   async function submit() {
     setErr("");
     if (!title.trim()) return setErr("Give your project a name! ✏️");
-    if (type === "youtube" && !ytId(link)) return setErr("Paste a valid YouTube link 📺");
+    if (type === "youtube" && !isHttpUrl(link)) return setErr("Paste a valid link (starting with https://) 🔗");
     setBusy(true);
     try {
       const { project, award } = await api.createProject({
@@ -83,10 +83,10 @@ export default function AddModal({
 
         {showLink && (
           <div className="field">
-            <label>{type === "youtube" ? "Paste a YouTube link 📺" : "Paste a video link (optional) 🎬"}</label>
+            <label>{type === "youtube" ? "Paste a link 🔗" : "Paste a video link (optional) 🎬"}</label>
             <input type="url" value={link} onChange={(e) => setLink(e.target.value)}
-              placeholder="https://youtube.com/watch?v=..." />
-            <div className="hint">We&apos;ll show your video right here ✨</div>
+              placeholder="https://youtube.com / tiktok.com / vimeo.com ..." />
+            <div className="hint">YouTube, TikTok, Instagram, Vimeo, Scratch &amp; more. YouTube plays right here ✨</div>
           </div>
         )}
 

@@ -57,7 +57,7 @@ export default function Onboarding({ onDone }: { onDone: (u: User) => void }) {
               <label>How old are you?</label>
               <select value={age} onChange={(e) => setAge(e.target.value)}>
                 <option value="">Choose...</option>
-                {Array.from({ length: 9 }, (_, i) => i + 6).map((a) => (
+                {Array.from({ length: 15 }, (_, i) => i + 6).map((a) => (
                   <option key={a} value={a}>{a} years old</option>
                 ))}
               </select>

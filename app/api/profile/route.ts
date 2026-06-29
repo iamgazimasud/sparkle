@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const taken = await prisma.user.findUnique({ where: { name } });
   if (taken) return NextResponse.json({ error: "That nickname is taken — try another!" }, { status: 409 });
 
-  const age = Math.min(17, Math.max(5, Number(body.age) || 10));
+  const age = Math.min(20, Math.max(5, Number(body.age) || 10));
   const avatar = AVATARS.includes(body.avatar) ? body.avatar : "🦊";
 
   const user = await prisma.user.create({

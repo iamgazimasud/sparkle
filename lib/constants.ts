@@ -6,11 +6,45 @@ export const ART_EMOJIS = ["🎨","🖼️","🐉","🌈","🚀","🏰","🦄","
 
 export const CATS: Record<string, { label: string; e: string }> = {
   art: { label: "Art", e: "🎨" },
-  youtube: { label: "YouTube", e: "📺" },
+  // The "youtube" key is kept for existing data, but it now accepts ANY video/social
+  // link (YouTube, TikTok, Instagram, Vimeo, Scratch...), shown to kids as "Link".
+  youtube: { label: "Link", e: "🔗" },
   code: { label: "Code/Game", e: "🕹️" },
   video: { label: "Video", e: "🎬" },
   music: { label: "Music", e: "🎵" },
 };
+
+/** Allow only real web links (http/https) — blocks javascript: and other schemes. */
+export function isHttpUrl(s?: string | null): boolean {
+  if (!s) return false;
+  try {
+    const u = new URL(s.trim());
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** Identify the platform of a shared link so we can show a friendly card. */
+export function linkInfo(url?: string | null): { label: string; emoji: string; domain: string } | null {
+  if (!isHttpUrl(url)) return null;
+  let host = "";
+  try { host = new URL(url!).hostname.replace(/^www\./, ""); } catch { return null; }
+  const u = (url || "").toLowerCase();
+  const match = (re: RegExp, label: string, emoji: string) => (re.test(u) ? { label, emoji, domain: host } : null);
+  return (
+    match(/youtu\.?be|youtube\.com/, "YouTube", "📺") ||
+    match(/tiktok\.com/, "TikTok", "🎵") ||
+    match(/instagram\.com/, "Instagram", "📸") ||
+    match(/vimeo\.com/, "Vimeo", "🎬") ||
+    match(/facebook\.com|fb\.watch/, "Facebook", "👍") ||
+    match(/twitter\.com|x\.com/, "X", "🐦") ||
+    match(/scratch\.mit\.edu/, "Scratch", "🐱") ||
+    match(/twitch\.tv/, "Twitch", "🎮") ||
+    match(/soundcloud\.com/, "SoundCloud", "🎧") ||
+    { label: host || "Link", emoji: "🔗", domain: host }
+  );
+}
 
 export const STICKERS = ["So cool! 🤩","Amazing! 🌟","Love it! ❤️","Wow! 👏","Great job! 🎉","Teach me! 🙌","You rock! 🤘","Beautiful! 🌈"];
 

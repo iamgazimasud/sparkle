@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { getProjects } from "@/lib/shape";
-import { isKind, ytId, CATS, ART_EMOJIS } from "@/lib/constants";
+import { isKind, isHttpUrl, CATS, ART_EMOJIS } from "@/lib/constants";
 import { scoreNewProject } from "@/lib/score";
 import { interactionBlock } from "@/lib/guard";
 
@@ -37,8 +37,8 @@ export async function POST(req: Request) {
   if (desc.length > 280) return NextResponse.json({ error: "Description too long." }, { status: 400 });
   if (!isKind(title) || !isKind(desc))
     return NextResponse.json({ error: "Let's keep it kind & friendly! 💛" }, { status: 400 });
-  if (type === "youtube" && !ytId(link))
-    return NextResponse.json({ error: "Paste a valid YouTube link." }, { status: 400 });
+  if (type === "youtube" && !isHttpUrl(link))
+    return NextResponse.json({ error: "Paste a valid link (it should start with https://)." }, { status: 400 });
   // Keep uploaded images small (data URL). ~700KB cap.
   if (image && image.length > 950_000) image = null;
 
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     type,
     desc,
     hasImage: !!image,
-    hasVideo: type === "youtube" ? !!ytId(link) : type === "video" && !!link,
+    hasVideo: (type === "youtube" || type === "video") && isHttpUrl(link),
   });
   await prisma.user.update({ where: { id: user.id }, data: { sparks: { increment: award.total } } });
 

@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { CATS } from "@/lib/constants";
 import type { FeedItem, Project, User } from "./types";
 import { burst } from "./fx";
+import LinkCard from "./LinkCard";
 
 export default function FeedCard({
   item,
@@ -58,20 +59,24 @@ export default function FeedCard({
       <h3 className="post-title">{p.title}</h3>
       {p.desc && <p className="post-desc">{p.desc}</p>}
 
-      <div className="post-media" onClick={() => onOpen(p)}>
-        {p.ytId ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`https://img.youtube.com/vi/${p.ytId}/hqdefault.jpg`} alt="" />
-            <div className="play-ov"><div className="pbtn">▶️</div></div>
-          </>
-        ) : p.image ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={p.image} alt={p.title} />
-        ) : (
-          <div className="emoji-art">{p.cover || cat.e}</div>
-        )}
-      </div>
+      {p.link && !p.ytId ? (
+        <LinkCard url={p.link} />
+      ) : (
+        <div className="post-media" onClick={() => onOpen(p)}>
+          {p.ytId ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`https://img.youtube.com/vi/${p.ytId}/hqdefault.jpg`} alt="" />
+              <div className="play-ov"><div className="pbtn">▶️</div></div>
+            </>
+          ) : p.image ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={p.image} alt={p.title} />
+          ) : (
+            <div className="emoji-art">{p.cover || cat.e}</div>
+          )}
+        </div>
+      )}
 
       <div className="post-stats">
         <span>🌟 {p.likes}</span>

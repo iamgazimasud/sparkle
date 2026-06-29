@@ -4,6 +4,7 @@ import { CATS, STICKERS } from "@/lib/constants";
 import type { Project } from "./types";
 import { api } from "./api";
 import { burst } from "./fx";
+import LinkCard from "./LinkCard";
 
 const REASONS = ["It's mean or bullying", "It's not safe for kids", "It's spam", "Something else"];
 
@@ -72,16 +73,20 @@ export default function DetailModal({
       <div className="modal">
         <button className="x" onClick={onClose}>×</button>
 
-        <div className="detail-media">
-          {project.ytId ? (
-            <iframe src={`https://www.youtube.com/embed/${project.ytId}`} allowFullScreen title={project.title} />
-          ) : project.image ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={project.image} alt={project.title} />
-          ) : (
-            <div className="emoji-art">{project.cover || cat.e}</div>
-          )}
-        </div>
+        {project.link && !project.ytId ? (
+          <div style={{ marginBottom: 14 }}><LinkCard url={project.link} big /></div>
+        ) : (
+          <div className="detail-media">
+            {project.ytId ? (
+              <iframe src={`https://www.youtube.com/embed/${project.ytId}`} allowFullScreen title={project.title} />
+            ) : project.image ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={project.image} alt={project.title} />
+            ) : (
+              <div className="emoji-art">{project.cover || cat.e}</div>
+            )}
+          </div>
+        )}
 
         <div style={{ marginBottom: 6 }}>
           <span className="badge-cat" style={{ position: "static" }}>{cat.e} {cat.label}</span>
