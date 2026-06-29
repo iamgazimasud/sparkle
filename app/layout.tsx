@@ -33,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap"
           rel="stylesheet"
         />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
       <body>
         <div className="blob b1" /><div className="blob b2" />
