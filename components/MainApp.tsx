@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { levelFor } from "@/lib/constants";
-import type { Project, User, Award } from "./types";
+import type { FeedItem, Project, User, Award } from "./types";
 import { api } from "./api";
 import { confetti } from "./fx";
 import Feed from "./Feed";
@@ -13,15 +13,15 @@ import DetailModal from "./DetailModal";
 // The signed-in app. Auth/profile gating lives in SparkleApp (the Clerk gate).
 export default function MainApp({
   profile,
-  initialProjects,
+  initialFeed,
   onLogout,
 }: {
   profile: User;
-  initialProjects: Project[];
+  initialFeed: FeedItem[];
   onLogout: () => void;
 }) {
   const [user, setUser] = useState<User>(profile);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [feed, setFeed] = useState<FeedItem[]>(initialFeed);
   const [route, setRoute] = useState<"feed" | "profile">("feed");
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
@@ -32,17 +32,21 @@ export default function MainApp({
   const [levelUp, setLevelUp] = useState<{ e: string; name: string } | null>(null);
   const [award, setAward] = useState<Award | null>(null);
 
+  // Update a project everywhere it appears in the feed (a post + any re-shares).
   function patch(updated: Project) {
-    setProjects((ps) => ps.map((p) => (p.id === updated.id ? { ...updated } : p)));
+    setFeed((items) => items.map((it) => (it.project.id === updated.id ? { ...it, project: { ...updated } } : it)));
     setDetail((d) => (d && d.id === updated.id ? { ...updated } : d));
+  }
+
+  async function refreshFeed(f = filter) {
+    const items = await api.feed(f);
+    setFeed(items);
   }
 
   async function changeFilter(c: string) {
     setFilter(c);
     setLoading(true);
-    const list = await api.projects(c);
-    setProjects(list);
-    setLoading(false);
+    try { setFeed(await api.feed(c)); } finally { setLoading(false); }
   }
 
   function bumpSparks(n: number) {
@@ -51,33 +55,46 @@ export default function MainApp({
       const next = { ...u, sparks: u.sparks + n };
       const after = levelFor(next.sparks).idx;
       if (after > before) {
-        const L = levelFor(next.sparks).lv;
-        setLevelUp({ e: L.e, name: L.name });
+        setLevelUp({ e: levelFor(next.sparks).lv.e, name: levelFor(next.sparks).lv.name });
         confetti();
       }
       return next;
     });
   }
 
-  async function like(p: Project, _btn: HTMLElement) {
-    const optimistic = { ...p, liked: !p.liked, likes: p.likes + (p.liked ? -1 : 1) };
-    patch(optimistic);
+  async function like(p: Project, _btn?: HTMLElement) {
+    patch({ ...p, liked: !p.liked, likes: p.likes + (p.liked ? -1 : 1) });
     try {
       const res = await api.toggleLike(p.id);
       patch({ ...p, liked: res.liked, likes: res.likes });
       if (res.liked) bumpSparks(1);
-    } catch {
-      patch(p);
-    }
+    } catch { patch(p); }
   }
 
-  function onCommented(p: Project) {
+  async function share(p: Project, _btn?: HTMLElement) {
+    const wasShared = p.shared;
+    patch({ ...p, shared: !wasShared, shares: p.shares + (wasShared ? -1 : 1) });
+    try {
+      const res = await api.toggleShare(p.id);
+      patch({ ...p, shared: res.shared, shares: res.shares });
+      if (res.shared) bumpSparks(1);
+      await refreshFeed(); // reflect the new "shared by you" entry in the timeline
+    } catch { patch(p); }
+  }
+
+  async function comment(p: Project, text: string) {
+    const c = await api.comment(p.id, text);
+    patch({ ...p, comments: [...p.comments, c] });
+    bumpSparks(2);
+  }
+
+  function onCommentedFromModal(p: Project) {
     patch({ ...p });
     bumpSparks(2);
   }
 
   function onCreated(p: Project, earned: Award) {
-    setProjects((ps) => [p, ...ps.filter((x) => x.id !== p.id)]);
+    setFeed((items) => [{ id: `post:${p.id}`, project: p }, ...items.filter((it) => it.project.id !== p.id)]);
     setAddOpen(false);
     setFilter("all");
     setRoute("feed");
@@ -100,9 +117,7 @@ export default function MainApp({
             <div className="mark">✨</div><span>Spark<b>le</b></span>
           </div>
           <div className="spacer" />
-          {user.isAdmin && (
-            <a className="ghost-btn" href="/admin" title="Moderation dashboard">🛡️ Admin</a>
-          )}
+          {user.isAdmin && <a className="ghost-btn" href="/admin" title="Moderation dashboard">🛡️ Admin</a>}
           <div className="coin" title="Sparks you earned!"><span className="big">⚡</span><span>{user.sparks}</span></div>
           <button className="me-btn" onClick={() => setRoute("profile")}>
             <span>{user.name}</span><span className="av">{user.avatar}</span>
@@ -117,12 +132,14 @@ export default function MainApp({
         {route === "feed" ? (
           <Feed
             user={user}
-            projects={projects}
+            items={feed}
             filter={filter}
             setFilter={changeFilter}
             loading={loading}
             onOpen={setDetail}
             onLike={like}
+            onShare={share}
+            onComment={comment}
           />
         ) : (
           <Profile user={user} onOpen={setDetail} onLike={like} onLogout={onLogout} />
@@ -135,7 +152,7 @@ export default function MainApp({
 
       <nav className="botnav">
         <button className={route === "feed" ? "on" : ""} onClick={() => setRoute("feed")}>
-          <span className="e">🏠</span>Explore
+          <span className="e">🏠</span>Feed
         </button>
         <button onClick={() => openAdd()}><span className="e">➕</span>Add</button>
         <button className={route === "profile" ? "on" : ""} onClick={() => setRoute("profile")}>
@@ -149,15 +166,13 @@ export default function MainApp({
           myId={user.id}
           onClose={() => setDetail(null)}
           onLike={like}
-          onCommented={onCommented}
+          onCommented={onCommentedFromModal}
           onInspired={(type) => openAdd(type)}
-          onBlocked={() => { setDetail(null); changeFilter(filter); }}
+          onBlocked={() => { setDetail(null); refreshFeed(); }}
         />
       )}
 
-      {addOpen && (
-        <AddModal initialType={addType} onClose={() => setAddOpen(false)} onCreated={onCreated} />
-      )}
+      {addOpen && <AddModal initialType={addType} onClose={() => setAddOpen(false)} onCreated={onCreated} />}
 
       {award && (
         <div className="scrim" onClick={() => setAward(null)}>
@@ -172,12 +187,9 @@ export default function MainApp({
                   <span className="ap">+{part.points}</span>
                 </div>
               ))}
-              <div className="award-row total">
-                <span className="al">Total</span>
-                <span className="ap">⚡ {award.total}</span>
-              </div>
+              <div className="award-row total"><span className="al">Total</span><span className="ap">⚡ {award.total}</span></div>
             </div>
-            <p className="hint">💡 Get even more when other kids ❤️ like and 💬 comment on your project!</p>
+            <p className="hint">💡 Get even more when other kids ❤️ like, 💬 comment, and 🔁 share your project!</p>
             <button className="primary" onClick={() => setAward(null)}>Woohoo! 🎉</button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import type { Project, Comment, User, Award } from "./types";
+import type { Project, Comment, User, Award, FeedItem } from "./types";
 
 async function jsonOrThrow(res: Response) {
   const data = await res.json().catch(() => ({}));
@@ -20,6 +20,13 @@ export const api = {
     if (author) q.set("author", author);
     const d = await (await fetch(`/api/projects?${q}`)).json();
     return d.projects;
+  },
+  async feed(type = "all"): Promise<FeedItem[]> {
+    const d = await (await fetch(`/api/feed?type=${type}`)).json();
+    return d.items;
+  },
+  async toggleShare(id: string, message?: string): Promise<{ shared: boolean; shares: number }> {
+    return jsonOrThrow(await post(`/api/projects/${id}/share`, { message }));
   },
   async createProject(input: {
     type: string; title: string; desc: string; cover: string; link?: string; image?: string | null;

@@ -1,7 +1,7 @@
 "use client";
 import { CATS } from "@/lib/constants";
-import type { Project, User } from "./types";
-import ProjectCard from "./ProjectCard";
+import type { FeedItem, Project, User } from "./types";
+import FeedCard from "./FeedCard";
 
 const CHIPS: [string, string, string][] = [
   ["all", "✨", "All"],
@@ -10,39 +10,38 @@ const CHIPS: [string, string, string][] = [
 
 export default function Feed({
   user,
-  projects,
+  items,
   filter,
   setFilter,
   loading,
   onOpen,
   onLike,
+  onShare,
+  onComment,
 }: {
   user: User;
-  projects: Project[];
+  items: FeedItem[];
   filter: string;
   setFilter: (c: string) => void;
   loading: boolean;
   onOpen: (p: Project) => void;
   onLike: (p: Project, btn: HTMLElement) => void;
+  onShare: (p: Project, btn: HTMLElement) => void;
+  onComment: (p: Project, text: string) => Promise<void>;
 }) {
   return (
-    <>
+    <div className="feed-wrap">
       <div className="hero">
         <div style={{ flex: 1 }}>
           <h1>Hi {user.name}! {user.avatar}</h1>
-          <p>Check out what other makers built — then share your own and earn ⚡ Sparks!</p>
+          <p>See what other makers are up to — like, comment, and share to your feed! 🔁</p>
         </div>
         <div className="pin">🎨</div>
       </div>
 
       <div className="chips">
         {CHIPS.map(([k, e, l]) => (
-          <button
-            key={k}
-            className={`chip ${k === filter ? "on" : ""}`}
-            data-c={k}
-            onClick={() => setFilter(k)}
-          >
+          <button key={k} className={`chip ${k === filter ? "on" : ""}`} data-c={k} onClick={() => setFilter(k)}>
             {e} {l}
           </button>
         ))}
@@ -50,21 +49,19 @@ export default function Feed({
 
       {loading ? (
         <div className="spinner" />
-      ) : projects.length ? (
-        <div className="grid">
-          {projects.map((p) => (
-            <ProjectCard key={p.id} p={p} onOpen={onOpen} onLike={onLike} />
+      ) : items.length ? (
+        <div className="feed">
+          {items.map((it) => (
+            <FeedCard key={it.id} item={it} me={user} onOpen={onOpen} onLike={onLike} onShare={onShare} onComment={onComment} />
           ))}
         </div>
       ) : (
-        <div className="grid">
-          <div className="empty">
-            <div className="big">🔭</div>
-            <h3>No projects here yet</h3>
-            <p>Be the first to share something awesome in this category!</p>
-          </div>
+        <div className="empty">
+          <div className="big">🔭</div>
+          <h3>Nothing here yet</h3>
+          <p>Be the first to share something awesome — tap ＋ Add Project!</p>
         </div>
       )}
-    </>
+    </div>
   );
 }

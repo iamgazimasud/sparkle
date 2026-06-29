@@ -39,6 +39,7 @@ model User {
   projects      Project[]
   comments      Comment[]
   likes         Like[]
+  shares        Share[]
   reportsMade   Report[]  @relation("reporter")
   blocksMade    Block[]   @relation("blocker")
   blocksAgainst Block[]   @relation("blocked")
@@ -60,6 +61,7 @@ model Project {
 
   comments Comment[]
   likes    Like[]
+  shares   Share[]
   reports  Report[]
 
   @@index([type])
@@ -99,6 +101,21 @@ model Report {
   targetUserId String? // reporting a user directly
 
   @@index([status])
+}
+
+// A re-share of a project to the sharer's feed (like a Facebook share).
+model Share {
+  id        String   @id @default(cuid())
+  message   String? // optional note added when sharing
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@index([createdAt])
 }
 
 // One kid blocking another — hides the blocked user's content from the blocker.

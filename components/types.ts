@@ -34,6 +34,16 @@ export type Project = {
   createdAt: string;
   author: { id: string; name: string; age: number; avatar: string };
   likes: number;
+  shares: number;
   comments: Comment[];
   liked: boolean;
+  shared: boolean;
+};
+
+export type FeedItem = {
+  id: string;
+  project: Project;
+  sharedBy?: { name: string; avatar: string };
+  sharedAt?: string;
+  shareMessage?: string | null;
 };

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
-import type { Project, User } from "./types";
+import type { FeedItem, User } from "./types";
 import { api } from "./api";
 import MainApp from "./MainApp";
 import Landing from "./Landing";
@@ -11,16 +11,16 @@ import ConsentGate from "./ConsentGate";
 export default function SparkleApp({
   clerkEnabled,
   initialUser,
-  initialProjects,
+  initialFeed,
 }: {
   clerkEnabled: boolean;
   authed: boolean;
   initialUser: User | null;
-  initialProjects: Project[];
+  initialFeed: FeedItem[];
 }) {
   // Without Clerk keys the app still boots — show a friendly setup screen.
   if (!clerkEnabled) return <SetupNotice />;
-  return <ClerkGate initialUser={initialUser} initialProjects={initialProjects} />;
+  return <ClerkGate initialUser={initialUser} initialFeed={initialFeed} />;
 }
 
 function Spinner() {
@@ -30,10 +30,10 @@ function Spinner() {
 // Uses Clerk hooks — only ever mounted when ClerkProvider is present.
 function ClerkGate({
   initialUser,
-  initialProjects,
+  initialFeed,
 }: {
   initialUser: User | null;
-  initialProjects: Project[];
+  initialFeed: FeedItem[];
 }) {
   const { isLoaded, isSignedIn } = useUser();
   const { signOut } = useClerk();
@@ -67,7 +67,7 @@ function ClerkGate({
     return <ConsentGate onConsented={setProfile} onSkip={() => setConsentSkipped(true)} />;
   }
 
-  return <MainApp profile={profile} initialProjects={initialProjects} onLogout={logout} />;
+  return <MainApp profile={profile} initialFeed={initialFeed} onLogout={logout} />;
 }
 
 function SetupNotice() {
