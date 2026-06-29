@@ -40,6 +40,15 @@ export type Project = {
   shared: boolean;
 };
 
+export type LeaderEntry = {
+  rank: number;
+  id: string;
+  name: string;
+  avatar: string;
+  score: number;
+  projects: number;
+};
+
 export type FeedItem = {
   id: string;
   project: Project;

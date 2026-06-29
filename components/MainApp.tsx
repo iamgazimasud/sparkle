@@ -7,6 +7,7 @@ import { api } from "./api";
 import { confetti } from "./fx";
 import Feed from "./Feed";
 import Gallery from "./Gallery";
+import Leaderboard from "./Leaderboard";
 import Profile from "./Profile";
 import AddModal from "./AddModal";
 import DetailModal from "./DetailModal";
@@ -16,7 +17,7 @@ const CHIPS: [string, string, string][] = [
   ...Object.entries(CATS).map(([k, v]) => [k, v.e, v.label] as [string, string, string]),
 ];
 
-type Route = "gallery" | "feed" | "profile";
+type Route = "gallery" | "feed" | "leaderboard" | "profile";
 
 export default function MainApp({
   profile,
@@ -116,7 +117,8 @@ export default function MainApp({
     setAddOpen(true);
   }
 
-  const browsing = route === "gallery" || route === "feed";
+  const browsing = route === "gallery" || route === "feed" || route === "leaderboard";
+  const showChips = route === "gallery" || route === "feed";
 
   return (
     <>
@@ -147,26 +149,33 @@ export default function MainApp({
                 <h1>Hi {user.name}! {user.avatar}</h1>
                 <p>{route === "feed"
                   ? "See what makers are up to — like, comment & share to your feed! 🔁"
+                  : route === "leaderboard"
+                  ? "This month's top makers — keep creating to climb! 🏆"
                   : "Browse cool projects and get inspired to make your own! ✨"}</p>
               </div>
-              <div className="pin">🎨</div>
+              <div className="pin">{route === "leaderboard" ? "🏆" : "🎨"}</div>
             </div>
 
             <div className="tabs view-tabs">
               <button className={route === "gallery" ? "on" : ""} onClick={() => setRoute("gallery")}>🖼️ Gallery</button>
               <button className={route === "feed" ? "on" : ""} onClick={() => setRoute("feed")}>📰 Feed</button>
+              <button className={route === "leaderboard" ? "on" : ""} onClick={() => setRoute("leaderboard")}>🏆 Top</button>
             </div>
 
-            <div className="chips">
-              {CHIPS.map(([k, e, l]) => (
-                <button key={k} className={`chip ${k === filter ? "on" : ""}`} data-c={k} onClick={() => changeFilter(k)}>
-                  {e} {l}
-                </button>
-              ))}
-            </div>
+            {showChips && (
+              <div className="chips">
+                {CHIPS.map(([k, e, l]) => (
+                  <button key={k} className={`chip ${k === filter ? "on" : ""}`} data-c={k} onClick={() => changeFilter(k)}>
+                    {e} {l}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {route === "gallery" ? (
               <Gallery user={user} projects={projects} loading={loading} onOpen={setDetail} onLike={like} />
+            ) : route === "leaderboard" ? (
+              <Leaderboard me={user} />
             ) : (
               <div className="feed-wrap">
                 <Feed user={user} items={feed} loading={loading} onOpen={setDetail} onLike={like} onShare={share} onComment={comment} />
@@ -187,7 +196,9 @@ export default function MainApp({
         <button className={route === "feed" ? "on" : ""} onClick={() => setRoute("feed")}>
           <span className="e">📰</span>Feed
         </button>
-        <button onClick={() => openAdd()}><span className="e">➕</span>Add</button>
+        <button className={route === "leaderboard" ? "on" : ""} onClick={() => setRoute("leaderboard")}>
+          <span className="e">🏆</span>Top
+        </button>
         <button className={route === "profile" ? "on" : ""} onClick={() => setRoute("profile")}>
           <span className="e">⭐</span>Me
         </button>
