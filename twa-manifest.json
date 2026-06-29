@@ -1,0 +1,23 @@
+{
+  "packageId": "app.sparkle.kids",
+  "host": "sparkle-nine-tau.vercel.app",
+  "name": "Sparkle",
+  "launcherName": "Sparkle",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#ff5fa2",
+  "themeColorDark": "#ff5fa2",
+  "navigationColor": "#ff5fa2",
+  "navigationColorDark": "#ff5fa2",
+  "backgroundColor": "#fff7fb",
+  "startUrl": "/",
+  "iconUrl": "https://sparkle-nine-tau.vercel.app/icon-512.png",
+  "maskableIconUrl": "https://sparkle-nine-tau.vercel.app/icon-512.png",
+  "webManifestUrl": "https://sparkle-nine-tau.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "enableNotifications": false,
+  "signingKey": { "path": "./android-keystore.jks", "alias": "sparkle" },
+  "generatorApp": "bubblewrap-cli"
+}

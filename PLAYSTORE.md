@@ -38,7 +38,35 @@ This review is stricter and slower than a normal app. Budget time for back-and-f
 
 ---
 
-## 🛠️ Build the Android app (after the site is live)
+## ✅ The TWA project is pre-configured
+
+This repo already contains:
+- **`twa-manifest.json`** — the Android wrapper config (package id `app.sparkle.kids`,
+  name, colors, icon, points at your live manifest). Both tools below read this.
+- **`public/.well-known/assetlinks.json`** — the domain-verification file (live at
+  `https://sparkle-nine-tau.vercel.app/.well-known/assetlinks.json`). It has a
+  placeholder fingerprint you'll replace in one step (below).
+
+---
+
+## 🟢 Easiest: PWABuilder (no installs, ~5 min) — recommended
+
+1. Go to **https://www.pwabuilder.com** and enter your live URL:
+   `https://sparkle-nine-tau.vercel.app`
+2. Click **Package For Stores → Android (Google Play)**.
+3. Use defaults but set **Package ID = `app.sparkle.kids`** (must match our assetlinks).
+4. Download the zip — it contains your **`.aab`** (upload this to Play) *and* a
+   **`signing-key-info`** file with the **SHA-256 fingerprint** + the keystore.
+   - 🔒 **Back up that keystore + passwords forever** — you need the same key for every update.
+5. Tell me the SHA-256 fingerprint (or paste it) → I'll drop it into
+   `public/.well-known/assetlinks.json` and redeploy so the app verifies your domain
+   (removes the browser address bar).
+
+That's it — you have a Play-ready `.aab`.
+
+---
+
+## 🧰 Alternative: Bubblewrap CLI (needs JDK + Android SDK locally)
 
 ```bash
 # 1. Install Bubblewrap
