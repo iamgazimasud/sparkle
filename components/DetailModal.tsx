@@ -72,21 +72,26 @@ export default function DetailModal({
 
   return (
     <div className="scrim" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal">
+      <div className="modal" style={{ maxWidth: 600 }}>
         <button className="x" onClick={onClose}>×</button>
 
         {project.link && !project.ytId ? (
           <div style={{ marginBottom: 14 }}><LinkCard url={project.link} big /></div>
+        ) : project.ytId ? (
+          <div className="detail-media">
+            <iframe src={`https://www.youtube.com/embed/${project.ytId}`} allowFullScreen title={project.title} />
+          </div>
+        ) : project.image ? (
+          <>
+            <a className="detail-photo" href={project.image} target="_blank" rel="noopener noreferrer" title="Open full size">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={project.image} alt={project.title} />
+            </a>
+            <div className="hint" style={{ marginTop: 0, marginBottom: 12 }}>🔍 Tap the picture to see it full size ↗</div>
+          </>
         ) : (
           <div className="detail-media">
-            {project.ytId ? (
-              <iframe src={`https://www.youtube.com/embed/${project.ytId}`} allowFullScreen title={project.title} />
-            ) : project.image ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={project.image} alt={project.title} />
-            ) : (
-              <div className="emoji-art">{project.cover || cat.e}</div>
-            )}
+            <div className="emoji-art">{project.cover || cat.e}</div>
           </div>
         )}
 
