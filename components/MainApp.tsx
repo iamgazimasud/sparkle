@@ -11,6 +11,7 @@ import Leaderboard from "./Leaderboard";
 import Profile from "./Profile";
 import AddModal from "./AddModal";
 import DetailModal from "./DetailModal";
+import UserProfileModal from "./UserProfileModal";
 
 const CHIPS: [string, string, string][] = [
   ["all", "✨", "All"],
@@ -35,6 +36,7 @@ export default function MainApp({
   const [loading, setLoading] = useState(false);
 
   const [detail, setDetail] = useState<Project | null>(null);
+  const [viewUserId, setViewUserId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [addType, setAddType] = useState<string | undefined>(undefined);
   const [levelUp, setLevelUp] = useState<{ e: string; name: string } | null>(null);
@@ -117,6 +119,11 @@ export default function MainApp({
     setAddOpen(true);
   }
 
+  function openUser(id: string) {
+    setDetail(null);
+    setViewUserId(id);
+  }
+
   const browsing = route === "gallery" || route === "feed" || route === "leaderboard";
   const showChips = route === "gallery" || route === "feed";
 
@@ -173,12 +180,12 @@ export default function MainApp({
             )}
 
             {route === "gallery" ? (
-              <Gallery user={user} projects={projects} loading={loading} onOpen={setDetail} onLike={like} />
+              <Gallery user={user} projects={projects} loading={loading} onOpen={setDetail} onLike={like} onOpenUser={openUser} />
             ) : route === "leaderboard" ? (
               <Leaderboard me={user} />
             ) : (
               <div className="feed-wrap">
-                <Feed user={user} items={feed} loading={loading} onOpen={setDetail} onLike={like} onShare={share} onComment={comment} />
+                <Feed user={user} items={feed} loading={loading} onOpen={setDetail} onLike={like} onShare={share} onComment={comment} onOpenUser={openUser} />
               </div>
             )}
           </>
@@ -204,6 +211,15 @@ export default function MainApp({
         </button>
       </nav>
 
+      {viewUserId && (
+        <UserProfileModal
+          userId={viewUserId}
+          onClose={() => setViewUserId(null)}
+          onOpenProject={setDetail}
+          onLike={like}
+        />
+      )}
+
       {detail && (
         <DetailModal
           project={detail}
@@ -213,6 +229,7 @@ export default function MainApp({
           onCommented={onCommentedFromModal}
           onInspired={(type) => openAdd(type)}
           onBlocked={() => { setDetail(null); refreshFeed(); }}
+          onOpenUser={openUser}
         />
       )}
 

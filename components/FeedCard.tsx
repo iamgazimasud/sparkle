@@ -12,6 +12,7 @@ export default function FeedCard({
   onLike,
   onShare,
   onComment,
+  onOpenUser,
 }: {
   item: FeedItem;
   me: User;
@@ -19,6 +20,7 @@ export default function FeedCard({
   onLike: (p: Project, btn: HTMLElement) => void;
   onShare: (p: Project, btn: HTMLElement) => void;
   onComment: (p: Project, text: string) => Promise<void>;
+  onOpenUser: (id: string) => void;
 }) {
   const p = item.project;
   const cat = CATS[p.type] ?? { e: "✨", label: "Project" };
@@ -48,7 +50,7 @@ export default function FeedCard({
       )}
       {item.shareMessage && <div className="post-sharemsg">“{item.shareMessage}”</div>}
 
-      <header className="post-head">
+      <header className="post-head clickable" onClick={() => onOpenUser(p.author.id)}>
         <span className="av big">{p.author.avatar}</span>
         <div>
           <div className="post-author">{p.author.name} <span className="age">· age {p.author.age}</span></div>

@@ -8,12 +8,14 @@ export default function Gallery({
   loading,
   onOpen,
   onLike,
+  onOpenUser,
 }: {
   user: User;
   projects: Project[];
   loading: boolean;
   onOpen: (p: Project) => void;
   onLike: (p: Project, btn: HTMLElement) => void;
+  onOpenUser: (id: string) => void;
 }) {
   if (loading) return <div className="spinner" />;
   if (!projects.length) {
@@ -30,7 +32,7 @@ export default function Gallery({
   return (
     <div className="grid">
       {projects.map((p) => (
-        <ProjectCard key={p.id} p={p} onOpen={onOpen} onLike={onLike} />
+        <ProjectCard key={p.id} p={p} onOpen={onOpen} onLike={onLike} onOpenUser={onOpenUser} />
       ))}
     </div>
   );

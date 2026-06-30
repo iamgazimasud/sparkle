@@ -11,6 +11,7 @@ export default function Feed({
   onLike,
   onShare,
   onComment,
+  onOpenUser,
 }: {
   user: User;
   items: FeedItem[];
@@ -19,6 +20,7 @@ export default function Feed({
   onLike: (p: Project, btn: HTMLElement) => void;
   onShare: (p: Project, btn: HTMLElement) => void;
   onComment: (p: Project, text: string) => Promise<void>;
+  onOpenUser: (id: string) => void;
 }) {
   if (loading) return <div className="spinner" />;
   if (!items.length) {
@@ -33,7 +35,7 @@ export default function Feed({
   return (
     <div className="feed">
       {items.map((it) => (
-        <FeedCard key={it.id} item={it} me={user} onOpen={onOpen} onLike={onLike} onShare={onShare} onComment={onComment} />
+        <FeedCard key={it.id} item={it} me={user} onOpen={onOpen} onLike={onLike} onShare={onShare} onComment={onComment} onOpenUser={onOpenUser} />
       ))}
     </div>
   );

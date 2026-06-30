@@ -7,10 +7,12 @@ export default function ProjectCard({
   p,
   onOpen,
   onLike,
+  onOpenUser,
 }: {
   p: Project;
   onOpen: (p: Project) => void;
   onLike: (p: Project, btn: HTMLElement) => void;
+  onOpenUser?: (id: string) => void;
 }) {
   const cat = CATS[p.type] ?? { e: "✨", label: "Project" };
   return (
@@ -33,7 +35,10 @@ export default function ProjectCard({
       <div className="body">
         <h3>{p.title}</h3>
         <p className="desc">{p.desc}</p>
-        <div className="author">
+        <div
+          className={`author${onOpenUser ? " clickable" : ""}`}
+          onClick={onOpenUser ? (e) => { e.stopPropagation(); onOpenUser(p.author.id); } : undefined}
+        >
           <span className="av">{p.author.avatar}</span>
           <span>{p.author.name}</span>
           <span className="age">· age {p.author.age}</span>

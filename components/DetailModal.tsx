@@ -18,6 +18,7 @@ export default function DetailModal({
   onCommented,
   onInspired,
   onBlocked,
+  onOpenUser,
 }: {
   project: Project;
   myId: string;
@@ -26,6 +27,7 @@ export default function DetailModal({
   onCommented: (p: Project) => void;
   onInspired: (type: string) => void;
   onBlocked: () => void;
+  onOpenUser: (id: string) => void;
 }) {
   const [text, setText] = useState("");
   const [err, setErr] = useState("");
@@ -92,7 +94,8 @@ export default function DetailModal({
           <span className="badge-cat" style={{ position: "static" }}>{cat.e} {cat.label}</span>
         </div>
         <h2>{project.title}</h2>
-        <div className="author" style={{ margin: "4px 0 10px" }}>
+        <div className="author clickable" style={{ margin: "4px 0 10px" }}
+          onClick={() => onOpenUser(project.author.id)}>
           <span className="av">{project.author.avatar}</span>
           <span>{project.author.name}</span>
           <span className="age">· age {project.author.age}</span>

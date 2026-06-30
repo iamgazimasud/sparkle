@@ -40,6 +40,15 @@ export type Project = {
   shared: boolean;
 };
 
+export type MakerProfile = {
+  id: string;
+  name: string;
+  avatar: string;
+  age: number;
+  sparks: number;
+  plan: string;
+};
+
 export type LeaderEntry = {
   rank: number;
   id: string;

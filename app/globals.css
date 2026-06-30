@@ -73,6 +73,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop
 .author{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
 .author .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--bg2)}
 .author .age{color:var(--ink-soft);font-weight:600;font-size:12px}
+.author.clickable,.post-head.clickable{cursor:pointer;border-radius:12px;transition:opacity .12s}
+.author.clickable:hover,.post-head.clickable:hover{opacity:.65}
 .actions{display:flex;align-items:center;gap:8px;margin-top:auto}
 .react{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:999px;padding:8px 12px;font-weight:800;font-size:14px;color:var(--ink);transition:transform .1s,background .15s}
 .react:hover{transform:scale(1.06)}
