@@ -58,6 +58,12 @@ export type LeaderEntry = {
   projects: number;
 };
 
+export type LeaderboardData = {
+  month: string;
+  entries: LeaderEntry[];
+  previousMonth: { month: string; winner: LeaderEntry | null };
+};
+
 export type FeedItem = {
   id: string;
   project: Project;

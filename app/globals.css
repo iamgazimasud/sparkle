@@ -143,6 +143,27 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop
 
 /* ===== Monthly leaderboard ===== */
 .lb-wrap{max-width:600px;margin:0 auto}
+.champ-card{
+  text-align:center;cursor:pointer;border-radius:26px;padding:22px 18px 20px;margin-bottom:22px;
+  background:linear-gradient(145deg,#ffe37a,#ffb347 55%,#ff8a3d);
+  box-shadow:0 12px 28px rgba(255,150,50,.35);position:relative;overflow:hidden;
+  transition:transform .15s;
+}
+.champ-card:hover{transform:translateY(-3px)}
+.champ-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 15%, rgba(255,255,255,.5), transparent 45%);
+  pointer-events:none;
+}
+.champ-crown{font-size:34px;line-height:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.15))}
+.champ-label{font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7a4400;margin-top:4px}
+.champ-av{
+  font-size:46px;width:84px;height:84px;margin:12px auto 8px;border-radius:50%;
+  background:rgba(255,255,255,.55);display:grid;place-items:center;
+  box-shadow:0 0 0 4px rgba(255,255,255,.7), 0 8px 18px rgba(160,80,0,.25);
+}
+.champ-name{font-weight:900;font-size:22px;color:#5a3200}
+.champ-score{font-weight:700;font-size:14px;color:#7a4400;margin-top:4px}
 .lb-head{text-align:center;margin-bottom:16px}
 .lb-head h2{margin:4px 0 2px;font-size:24px}
 .lb-head p{margin:0;color:var(--ink-soft);font-weight:700;font-size:14px}

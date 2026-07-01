@@ -1,23 +1,35 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { LeaderEntry, User } from "./types";
+import type { LeaderboardData, User } from "./types";
 import { api } from "./api";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
 export default function Leaderboard({ me, onOpenUser }: { me: User; onOpenUser: (id: string) => void }) {
-  const [month, setMonth] = useState("");
-  const [entries, setEntries] = useState<LeaderEntry[]>([]);
+  const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.leaderboard().then((d) => { setMonth(d.month); setEntries(d.entries); }).finally(() => setLoading(false));
+    api.leaderboard().then(setData).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="spinner" />;
+  if (!data) return null;
+
+  const { month, entries, previousMonth } = data;
 
   return (
     <div className="lb-wrap">
+      {previousMonth.winner && (
+        <div className="champ-card" onClick={() => onOpenUser(previousMonth.winner!.id)}>
+          <div className="champ-crown">👑</div>
+          <div className="champ-label">{previousMonth.month}&apos;s Champion</div>
+          <div className="champ-av">{previousMonth.winner.avatar}</div>
+          <div className="champ-name">{previousMonth.winner.name}</div>
+          <div className="champ-score">⚡ {previousMonth.winner.score} Sparks · {previousMonth.winner.projects} project{previousMonth.winner.projects === 1 ? "" : "s"}</div>
+        </div>
+      )}
+
       <div className="lb-head">
         <div style={{ fontSize: 40 }}>🏆</div>
         <h2>Top Makers</h2>

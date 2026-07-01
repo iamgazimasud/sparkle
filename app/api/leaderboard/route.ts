@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { getMonthlyLeaderboard } from "@/lib/leaderboard";
+import { getMonthlyLeaderboard, getPreviousMonthWinner } from "@/lib/leaderboard";
 
-// GET /api/leaderboard -> this month's top makers
+// GET /api/leaderboard -> this month's top makers + last month's champion
 export async function GET() {
-  const data = await getMonthlyLeaderboard(20);
-  return NextResponse.json(data);
+  const [current, previousMonth] = await Promise.all([
+    getMonthlyLeaderboard(20),
+    getPreviousMonthWinner(),
+  ]);
+  return NextResponse.json({ ...current, previousMonth });
 }

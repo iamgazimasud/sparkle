@@ -1,4 +1,4 @@
-import type { Project, Comment, User, Award, FeedItem, LeaderEntry, MakerProfile } from "./types";
+import type { Project, Comment, User, Award, FeedItem, LeaderboardData, MakerProfile } from "./types";
 
 async function jsonOrThrow(res: Response) {
   const data = await res.json().catch(() => ({}));
@@ -61,7 +61,7 @@ export const api = {
   async adminAct(reportId: string, action: string) {
     return jsonOrThrow(await post(`/api/admin/reports/${reportId}`, { action }));
   },
-  async leaderboard(): Promise<{ month: string; entries: LeaderEntry[] }> {
+  async leaderboard(): Promise<LeaderboardData> {
     return (await fetch("/api/leaderboard")).json();
   },
   async userProfile(id: string): Promise<{ user: MakerProfile; projects: Project[]; commentsMade: number }> {
