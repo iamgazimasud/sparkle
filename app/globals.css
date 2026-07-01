@@ -149,6 +149,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop
 .lb-list{display:flex;flex-direction:column;gap:10px}
 .lb-row{display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:var(--shadow-sm)}
 .lb-row.top{background:linear-gradient(135deg,#fff6db,#ffe6f2)}
+.lb-row.clickable{cursor:pointer;transition:transform .12s}
+.lb-row.clickable:hover{transform:translateY(-2px)}
 .lb-row.me{outline:2px solid var(--purple);outline-offset:-2px}
 .lb-rank{font-size:22px;font-weight:900;width:34px;text-align:center;flex-shrink:0;color:var(--ink-soft)}
 .lb-av{font-size:26px;width:44px;height:44px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;flex-shrink:0}

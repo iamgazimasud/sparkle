@@ -5,7 +5,7 @@ import { api } from "./api";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
-export default function Leaderboard({ me }: { me: User }) {
+export default function Leaderboard({ me, onOpenUser }: { me: User; onOpenUser: (id: string) => void }) {
   const [month, setMonth] = useState("");
   const [entries, setEntries] = useState<LeaderEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,8 @@ export default function Leaderboard({ me }: { me: User }) {
       ) : (
         <div className="lb-list">
           {entries.map((e) => (
-            <div key={e.id} className={`lb-row${e.id === me.id ? " me" : ""}${e.rank <= 3 ? " top" : ""}`}>
+            <div key={e.id} className={`lb-row clickable${e.id === me.id ? " me" : ""}${e.rank <= 3 ? " top" : ""}`}
+              onClick={() => onOpenUser(e.id)}>
               <div className="lb-rank">{e.rank <= 3 ? MEDAL[e.rank - 1] : e.rank}</div>
               <div className="lb-av">{e.avatar}</div>
               <div className="lb-name">

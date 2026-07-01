@@ -182,7 +182,7 @@ export default function MainApp({
             {route === "gallery" ? (
               <Gallery user={user} projects={projects} loading={loading} onOpen={setDetail} onLike={like} onOpenUser={openUser} />
             ) : route === "leaderboard" ? (
-              <Leaderboard me={user} />
+              <Leaderboard me={user} onOpenUser={openUser} />
             ) : (
               <div className="feed-wrap">
                 <Feed user={user} items={feed} loading={loading} onOpen={setDetail} onLike={like} onShare={share} onComment={comment} onOpenUser={openUser} />
