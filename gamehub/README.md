@@ -2,6 +2,8 @@
 
 A standalone static website that collects all our browser games in one place.
 
+**Live at https://gazigames.vercel.app** (Vercel project `gazigames`).
+
 ## Games
 
 | Game | Folder | Source project |
@@ -34,5 +36,9 @@ python3 -m http.server 4610 -d gamehub
 
 ## Deploy
 
-Pure static files — deploy the `gamehub/` folder as-is to Vercel, Netlify,
-GitHub Pages, or any static host (e.g. `vercel deploy gamehub`).
+Pure static files. Production lives on Vercel (project `gazigames`,
+domain gazigames.vercel.app). To ship an update:
+
+```bash
+cd gamehub && vercel deploy --prod --yes
+```
