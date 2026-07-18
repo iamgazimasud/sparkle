@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#070a14">
-<title>GameHub</title>
+<title>Pixuvo</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
 <style>
 :root{--bg:#070a14;--line:#222c48;--txt:#eaf0ff;--dim:#8a94b8;--neon:#22d3ee}
@@ -38,7 +38,7 @@ iframe{width:100%;height:100%;border:0;display:block;background:#000}
 </head>
 <body>
 <div class="bar">
-  <a class="back" href="index.html">◂ GAMEHUB</a>
+  <a class="back" href="index.html">◂ PIXUVO</a>
   <span class="name" id="name">Loading…</span>
   <button class="fs" id="fs" title="Fullscreen">⛶ FULLSCREEN</button>
 </div>
@@ -51,7 +51,7 @@ const game = GAMES.find(g => g.slug === slug);
 if (!game) {
   location.replace("index.html");
 } else {
-  document.title = game.title + " — GameHub";
+  document.title = game.title + " — Pixuvo";
   document.getElementById("name").textContent = game.title;
   document.documentElement.style.setProperty("--accent", game.accent);
   const frame = document.getElementById("frame");

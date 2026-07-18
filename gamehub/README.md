@@ -1,8 +1,8 @@
-# 🎮 GameHub
+# 🎮 Pixuvo
 
 A standalone static website that collects all our browser games in one place.
 
-**Live at https://gazigames.vercel.app** (Vercel project `gazigames`).
+**Live at https://pixuvo.vercel.app** (Vercel project `pixuvo`).
 
 ## Games
 
@@ -36,8 +36,8 @@ python3 -m http.server 4610 -d gamehub
 
 ## Deploy
 
-Pure static files. Production lives on Vercel (project `gazigames`,
-domain gazigames.vercel.app). To ship an update:
+Pure static files. Production lives on Vercel (project `pixuvo`,
+domain pixuvo.vercel.app). To ship an update:
 
 ```bash
 cd gamehub && vercel deploy --prod --yes
