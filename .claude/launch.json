@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 4321
+    },
+    {
+      "name": "gamehub",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4610", "-d", "gamehub"],
+      "port": 4610
     }
   ]
 }

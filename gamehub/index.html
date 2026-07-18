@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070a14">
+<title>GameHub — Pick a Game. Press Play.</title>
+<meta name="description" content="GameHub — free browser games by Gazi Masud. Blast aliens in Space Frontier, outburn the AI in Shadow Fuse, build a mining empire in Idle Space Mining. No installs, no ads — just play.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GameHub — Pick a Game. Press Play.">
+<meta property="og:description" content="Free browser games: Space Frontier: Alien War, Shadow Fuse, Idle Space Mining. No installs — just play.">
+<meta property="og:image" content="games/shadow-fuse/assets/cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<style>
+:root{
+  --bg:#070a14; --panel:#0e1322; --panel2:#151c30; --line:#222c48;
+  --txt:#eaf0ff; --dim:#8a94b8;
+  --neon:#22d3ee; --pink:#f472b6; --gold:#fbbf24;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--txt);
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+  overflow-x:hidden;
+}
+
+/* ---- animated starfield + glow backdrop ---- */
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.sky::before{
+  content:"";position:absolute;inset:-50%;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 40% 70%, #9bd6ff 50%, transparent 51%),
+    radial-gradient(2px 2px at 60% 20%, #ffd9a0 50%, transparent 51%),
+    radial-gradient(1px 1px at 80% 50%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 10% 80%, #c3b4ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 85%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 50% 55%, #a5f3fc 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 90%, #fbcfe8 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 10%, #fff 50%, transparent 51%);
+  background-size:520px 520px;
+  animation:drift 120s linear infinite;
+  opacity:.7;
+}
+.sky::after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(34,211,238,.14), transparent 60%),
+    radial-gradient(900px 500px at 85% 0%, rgba(244,114,182,.12), transparent 60%),
+    radial-gradient(1100px 700px at 50% 115%, rgba(138,92,255,.16), transparent 60%);
+}
+@keyframes drift{to{transform:translate3d(-520px,-260px,0)}}
+
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 22px 60px}
+
+/* ---- header ---- */
+header{padding:56px 0 10px;text-align:center}
+.joy{font-size:56px;display:inline-block;animation:bob 3s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(34,211,238,.55))}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-6deg)}}
+h1{
+  margin:8px 0 0;font-size:clamp(44px,9vw,84px);font-weight:900;letter-spacing:.06em;
+  background:linear-gradient(180deg,#fff 10%,var(--neon) 55%,var(--pink));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 26px rgba(34,211,238,.4)) drop-shadow(0 8px 40px rgba(244,114,182,.25));
+}
+.tag{color:var(--dim);letter-spacing:.28em;text-transform:uppercase;font-size:clamp(11px,2.4vw,15px);margin:12px 0 0;font-weight:700}
+.tag b{color:var(--gold)}
+
+/* ---- marquee divider ---- */
+.zap{display:flex;align-items:center;gap:14px;margin:44px 0 26px;color:var(--dim);font-weight:800;letter-spacing:.18em;font-size:12px;text-transform:uppercase}
+.zap::before,.zap::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,transparent,var(--line));border-radius:2px}
+.zap::after{background:linear-gradient(90deg,var(--line),transparent)}
+
+/* ---- game grid ---- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px}
+.card{
+  --a:var(--neon); --a2:var(--pink);
+  position:relative;display:flex;flex-direction:column;
+  background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden;
+  text-decoration:none;color:inherit;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{
+  transform:translateY(-6px);
+  border-color:color-mix(in srgb, var(--a) 65%, transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--a) 45%, transparent),
+             0 18px 50px rgba(0,0,0,.55),
+             0 0 44px color-mix(in srgb, var(--a) 28%, transparent);
+}
+.cover{
+  position:relative;height:200px;
+  background:radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, var(--a) 26%, #0a0e1c) 0%, #0a0e1c 75%);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover img.contain{width:auto;height:78%;object-fit:contain;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6))}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(14,19,34,.92))}
+.badge{
+  position:absolute;top:12px;left:12px;z-index:2;
+  background:rgba(7,10,20,.75);backdrop-filter:blur(6px);
+  border:1px solid color-mix(in srgb, var(--a) 60%, transparent);
+  color:var(--a);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 10px;border-radius:999px;
+}
+.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h2{margin:0;font-size:21px;font-weight:800;letter-spacing:.02em}
+.tagline{margin:0;color:var(--a);font-size:13.5px;font-weight:700;letter-spacing:.04em}
+.desc{margin:0;color:var(--dim);font-size:13.5px;line-height:1.55;flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;color:#c2cbe8;font-size:11.5px;font-weight:700;padding:4px 10px}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+.controls{color:var(--dim);font-size:11px;letter-spacing:.06em}
+.play{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--a),var(--a2));color:#081018;
+  font-weight:900;letter-spacing:.1em;font-size:13px;
+  padding:10px 22px;border-radius:12px;
+  box-shadow:0 0 22px color-mix(in srgb, var(--a) 40%, transparent), 0 6px 16px rgba(0,0,0,.5);
+  transition:transform .12s, box-shadow .12s;
+}
+.card:hover .play{transform:scale(1.05);box-shadow:0 0 34px color-mix(in srgb, var(--a) 60%, transparent), 0 8px 20px rgba(0,0,0,.5)}
+
+/* coming soon ghost card */
+.soon{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  min-height:320px;border:2px dashed var(--line);border-radius:22px;color:var(--dim);
+  background:rgba(14,19,34,.4);text-align:center;padding:24px;
+}
+.soon .q{font-size:44px;opacity:.8;animation:bob 3.4s ease-in-out infinite}
+.soon b{color:#c2cbe8;letter-spacing:.08em}
+.soon span{font-size:13px;max-width:220px;line-height:1.5}
+
+footer{margin-top:56px;text-align:center;color:var(--dim);font-size:12.5px;letter-spacing:.06em}
+footer .heart{color:var(--pink)}
+
+@media (max-width:640px){
+  header{padding-top:40px}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="wrap">
+  <header>
+    <span class="joy">🎮</span>
+    <h1>GAMEHUB</h1>
+    <p class="tag">Pick a game <b>★</b> Press play <b>★</b> Beat your best</p>
+  </header>
+
+  <div class="zap">Now Playing · <span id="count"></span> games</div>
+
+  <main class="grid" id="grid"></main>
+
+  <footer>Made with <span class="heart">♥</span> at Kid Labs — new games land here first.</footer>
+</div>
+
+<script src="games.js"></script>
+<script>
+const grid = document.getElementById("grid");
+document.getElementById("count").textContent = GAMES.length;
+
+for (const g of GAMES) {
+  const a = document.createElement("a");
+  a.className = "card";
+  a.href = "play.html?g=" + encodeURIComponent(g.slug);
+  a.style.setProperty("--a", g.accent);
+  a.style.setProperty("--a2", g.accent2);
+  a.innerHTML = `
+    <div class="cover">
+      <span class="badge">Free to play</span>
+      <img class="${g.coverFit === "contain" ? "contain" : ""}" src="${g.cover}" alt="${g.title} cover art">
+    </div>
+    <div class="body">
+      <h2>${g.title}</h2>
+      <p class="tagline">${g.tagline}</p>
+      <p class="desc">${g.description}</p>
+      <div class="chips">${g.chips.map(c => `<span class="chip">${c}</span>`).join("")}</div>
+      <div class="meta">
+        <span class="controls">${g.controls}</span>
+        <span class="play">▶ PLAY</span>
+      </div>
+    </div>`;
+  grid.appendChild(a);
+}
+
+const soon = document.createElement("div");
+soon.className = "soon";
+soon.innerHTML = `<span class="q">❓</span><b>MORE GAMES SOON</b><span>The next cabinet in the arcade is being wired up…</span>`;
+grid.appendChild(soon);
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#070a14">
+<title>GameHub</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+<style>
+:root{--bg:#070a14;--line:#222c48;--txt:#eaf0ff;--dim:#8a94b8;--neon:#22d3ee}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif;overflow:hidden}
+.bar{
+  position:fixed;top:0;left:0;right:0;height:48px;z-index:20;
+  display:flex;align-items:center;gap:12px;padding:0 12px;
+  background:rgba(7,10,20,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.back{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  color:var(--txt);font-weight:800;font-size:13px;letter-spacing:.08em;
+  background:#151c30;border:1px solid var(--line);border-radius:10px;padding:7px 14px;
+  transition:border-color .12s, box-shadow .12s;
+}
+.back:hover{border-color:var(--neon);box-shadow:0 0 14px rgba(34,211,238,.35)}
+.name{flex:1;text-align:center;font-weight:800;font-size:14px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent,var(--neon));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs{
+  cursor:pointer;background:#151c30;border:1px solid var(--line);border-radius:10px;
+  color:var(--txt);font-size:13px;font-weight:800;padding:7px 14px;letter-spacing:.06em;
+  transition:border-color .12s, box-shadow .12s;font-family:inherit;
+}
+.fs:hover{border-color:var(--neon);box-shadow:0 0 14px rgba(34,211,238,.35)}
+#stage{position:fixed;top:48px;left:0;right:0;bottom:0}
+iframe{width:100%;height:100%;border:0;display:block;background:#000}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="back" href="index.html">◂ GAMEHUB</a>
+  <span class="name" id="name">Loading…</span>
+  <button class="fs" id="fs" title="Fullscreen">⛶ FULLSCREEN</button>
+</div>
+<div id="stage"><iframe id="frame" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe></div>
+
+<script src="games.js"></script>
+<script>
+const slug = new URLSearchParams(location.search).get("g");
+const game = GAMES.find(g => g.slug === slug);
+if (!game) {
+  location.replace("index.html");
+} else {
+  document.title = game.title + " — GameHub";
+  document.getElementById("name").textContent = game.title;
+  document.documentElement.style.setProperty("--accent", game.accent);
+  const frame = document.getElementById("frame");
+  frame.src = game.url;
+  frame.addEventListener("load", () => { try { frame.contentWindow.focus(); } catch {} });
+
+  const stage = document.getElementById("stage");
+  document.getElementById("fs").addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else (stage.requestFullscreen ? stage.requestFullscreen() : frame.requestFullscreen?.());
+  });
+}
+</script>
+</body>
+</html>

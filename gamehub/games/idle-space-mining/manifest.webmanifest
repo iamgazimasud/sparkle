@@ -1,0 +1,13 @@
+{
+  "name": "Idle Space Mining",
+  "short_name": "Space Mining",
+  "description": "Build the largest automated mining empire in the galaxy.",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05060e",
+  "theme_color": "#05060e",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
